@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin - Esmer Shop{% endblock %}</title>
+
+    {# Favicon #}
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>👟</text></svg>">
+
+    {% block stylesheets %}
+        {# Bootstrap CSS #}
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+        {# Bootstrap Icons #}
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+
+        {# Glassmorphism Design for Admin #}
+        <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+    {% endblock %}
+
+    {% block head_js %}{% endblock %}
+</head>
+<body>
+    {# Admin Navbar #}
+    {% block navbar %}
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4" style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="{{ path('admin_dashboard') }}">
+                <i class="bi bi-speedometer2"></i> Admin Panel
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="adminNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('admin_dashboard') }}">
+                            <i class="bi bi-house"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('admin_products_list') }}">
+                            <i class="bi bi-box-seam"></i> Produits
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('admin_orders') }}">
+                            <i class="bi bi-receipt"></i> Commandes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('admin_clients_list') }}">
+                            <i class="bi bi-people"></i> Clients
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('admin_categories_list') }}">
+                            <i class="bi bi-tag"></i> Catégories
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('admin_brands_list') }}">
+                            <i class="bi bi-award"></i> Marques
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('admin_coupons_list') }}">
+                            <i class="bi bi-ticket-perforated"></i> Coupons
+                        </a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-secondary">
+                        <i class="bi bi-person-circle"></i> {{ app.user.fullName }}
+                    </span>
+                    <a href="{{ path('app_home') }}" class="btn btn-sm btn-outline-light">
+                        <i class="bi bi-box-arrow-left"></i> Retour au site
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    {% endblock %}
+
+    {# Flash Messages #}
+    {% for label, messages in app.flashes %}
+        <div class="container">
+            {% for message in messages %}
+                <div class="alert alert-{{ label == 'success' ? 'success' : (label == 'error' ? 'danger' : 'info') }} alert-dismissible fade show" role="alert">
+                    <i class="bi bi-{{ label == 'success' ? 'check-circle' : (label == 'error' ? 'exclamation-triangle' : 'info-circle') }}"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    {# Main Content #}
+    <main>
+        {% block body %}{% endblock %}
+    </main>
+
+    {% block javascripts %}
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
+
+        {# Bootstrap JS #}
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+        {# Alpine.js for interactions #}
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    {% endblock %}
+</body>
+</html>

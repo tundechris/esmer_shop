@@ -1,0 +1,181 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tous les Produits - D2E SHOP{% endblock %}
+
+{% block body %}
+<div class="container py-section">
+    <h1 class="display-4" style="margin-bottom: var(--spacing-lg);">
+        Nos <span class="text-blue-apple">Produits</span>
+    </h1>
+    <p style="font-size: 19px; color: var(--text-secondary); margin-bottom: var(--spacing-xl);">
+        Découvrez notre collection complète de chaussures premium
+    </p>
+
+    {# Filtres et Recherche #}
+    <div class="card-minimal" style="margin-bottom: var(--spacing-lg);">
+        <form method="get" action="{{ path('app_products') }}" style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: var(--spacing-md);">
+            <div>
+                <label class="form-label-apple">Rechercher</label>
+                <input type="text" name="search" class="form-control-apple"
+                       placeholder="Nom du produit..." value="{{ currentSearch }}">
+            </div>
+            <div>
+                <label class="form-label-apple">Catégorie</label>
+                <select name="category" class="form-control-apple">
+                    <option value="">Toutes les catégories</option>
+                    {% for category in categories %}
+                    <option value="{{ category.slug }}" {% if currentCategory == category.slug %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="form-label-apple">Marque</label>
+                <select name="brand" class="form-control-apple">
+                    <option value="">Toutes les marques</option>
+                    {% for brand in brands %}
+                    <option value="{{ brand.slug }}" {% if currentBrand == brand.slug %}selected{% endif %}>
+                        {{ brand.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div style="display: flex; align-items: end;">
+                <button type="submit" class="btn-apple btn-apple-primary">
+                    <i class="bi bi-search"></i> Filtrer
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {# Résultats #}
+    <div style="margin-bottom: var(--spacing-md);">
+        <p style="color: var(--text-secondary);">
+            <strong>{{ totalItems }}</strong> produit(s) trouvé(s)
+            {% if totalPages > 1 %} - Page {{ currentPage }} sur {{ totalPages }}{% endif %}
+        </p>
+    </div>
+
+    {% if products|length > 0 %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--spacing-lg);">
+            {% for product in products %}
+                <div class="product-card-apple scroll-reveal">
+                    {% if product.isNewArrival %}
+                    <div class="product-badge new">Nouveau</div>
+                    {% elseif product.discountPrice %}
+                    <div class="product-badge sale">-{{ (((product.price - product.discountPrice) / product.price) * 100)|round }}%</div>
+                    {% endif %}
+
+                    <div class="product-image-wrapper">
+                        <a href="{{ path('app_product_detail', {slug: product.slug}) }}">
+                            <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="product-image">
+                        </a>
+                    </div>
+
+                    <div class="product-content">
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;">
+                            {{ product.brand.name }}
+                        </div>
+                        <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 8px;">
+                            <a href="{{ path('app_product_detail', {slug: product.slug}) }}" style="color: var(--text-primary); text-decoration: none;">
+                                {{ product.name }}
+                            </a>
+                        </h3>
+
+                        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">
+                            {{ product.description|slice(0, 50) }}...
+                        </p>
+
+                        <div style="margin-bottom: var(--spacing-sm);">
+                            <span class="badge-apple badge-apple-gray">{{ product.category.name }}</span>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                {% if product.discountPrice %}
+                                    <div style="font-size: 13px; text-decoration: line-through; color: var(--text-tertiary);">
+                                        {{ product.price }} €
+                                    </div>
+                                    <div style="font-size: 21px; font-weight: 600; color: var(--accent-blue);">
+                                        {{ product.finalPrice }} €
+                                    </div>
+                                {% else %}
+                                    <div style="font-size: 21px; font-weight: 600; color: var(--text-primary);">
+                                        {{ product.price }} €
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <a href="{{ path('app_product_detail', {slug: product.slug}) }}" class="btn-apple btn-apple-secondary btn-apple-sm">
+                                Voir
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {# Pagination #}
+        {% if totalPages > 1 %}
+        <div style="margin-top: var(--spacing-xl); padding-top: var(--spacing-xl); border-top: 1px solid var(--border-light);">
+            <nav style="display: flex; justify-content: center; align-items: center; gap: 8px;">
+                {# Bouton Précédent #}
+                {% if currentPage > 1 %}
+                    <a href="{{ path('app_products', {page: currentPage - 1, category: currentCategory, brand: currentBrand, search: currentSearch}) }}"
+                       class="btn-apple btn-apple-icon"
+                       style="border: 1px solid var(--border-medium); border-radius: var(--radius-sm); padding: 8px 12px;">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                {% else %}
+                    <span class="btn-apple btn-apple-icon"
+                          style="border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 8px 12px; opacity: 0.4; cursor: not-allowed;">
+                        <i class="bi bi-chevron-left"></i>
+                    </span>
+                {% endif %}
+
+                {# Numéros de pages #}
+                {% for page in 1..totalPages %}
+                    {% if page == currentPage %}
+                        <span class="btn-apple btn-apple-primary btn-apple-sm"
+                              style="min-width: 40px; border-radius: var(--radius-sm);">
+                            {{ page }}
+                        </span>
+                    {% elseif page == 1 or page == totalPages or (page >= currentPage - 2 and page <= currentPage + 2) %}
+                        <a href="{{ path('app_products', {page: page, category: currentCategory, brand: currentBrand, search: currentSearch}) }}"
+                           class="btn-apple btn-apple-secondary btn-apple-sm"
+                           style="min-width: 40px; border-radius: var(--radius-sm);">
+                            {{ page }}
+                        </a>
+                    {% elseif page == currentPage - 3 or page == currentPage + 3 %}
+                        <span style="color: var(--text-secondary); padding: 8px 4px;">...</span>
+                    {% endif %}
+                {% endfor %}
+
+                {# Bouton Suivant #}
+                {% if currentPage < totalPages %}
+                    <a href="{{ path('app_products', {page: currentPage + 1, category: currentCategory, brand: currentBrand, search: currentSearch}) }}"
+                       class="btn-apple btn-apple-icon"
+                       style="border: 1px solid var(--border-medium); border-radius: var(--radius-sm); padding: 8px 12px;">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                {% else %}
+                    <span class="btn-apple btn-apple-icon"
+                          style="border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 8px 12px; opacity: 0.4; cursor: not-allowed;">
+                        <i class="bi bi-chevron-right"></i>
+                    </span>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+    {% else %}
+        <div class="card-minimal no-hover" style="text-align: center; padding: var(--spacing-2xl);">
+            <i class="bi bi-inbox" style="font-size: 64px; color: var(--text-tertiary); margin-bottom: var(--spacing-md);"></i>
+            <h3 style="margin-bottom: var(--spacing-sm);">Aucun produit trouvé</h3>
+            <p class="text-secondary-apple">Essayez de modifier vos filtres</p>
+            <a href="{{ path('app_products') }}" class="btn-apple btn-apple-secondary" style="margin-top: var(--spacing-md);">
+                <i class="bi bi-arrow-clockwise"></i> Réinitialiser les filtres
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

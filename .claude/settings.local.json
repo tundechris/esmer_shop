@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(composer create-project:*)",
+      "Bash(cp:*)",
+      "Bash(rm:*)",
+      "Bash(php:*)",
+      "Bash(/c/laragon/bin/php/php-8.3.17-Win32-vs16-x64/php.exe bin/console cache:clear --no-warmup)",
+      "Bash(composer require:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

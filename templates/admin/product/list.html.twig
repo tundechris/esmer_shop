@@ -1,0 +1,122 @@
+{% extends 'admin_base.html.twig' %}
+
+{% block title %}Gestion des Produits - Admin{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1 class="display-5 fw-bold">
+            <i class="bi bi-box-seam"></i> Gestion des <span class="text-gradient">Produits</span>
+        </h1>
+        <a href="{{ path('admin_products_new') }}" class="btn btn-primary-glow">
+            <i class="bi bi-plus-circle"></i> Nouveau Produit
+        </a>
+    </div>
+
+    {% for message in app.flashes('success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle"></i> {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+
+    <div class="glass-card p-4">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Image</th>
+                        <th>Nom</th>
+                        <th>Marque</th>
+                        <th>Catégorie</th>
+                        <th>Prix</th>
+                        <th>Stock</th>
+                        <th>Statut</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td>
+                            <img src="{{ product.images[0] }}" alt="{{ product.name }}"
+                                 class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                        </td>
+                        <td>
+                            <strong>{{ product.name }}</strong>
+                            <br>
+                            <small class="text-secondary">{{ product.slug }}</small>
+                        </td>
+                        <td>{{ product.brand.name }}</td>
+                        <td>
+                            <span class="badge" style="background: rgba(139, 92, 246, 0.2); color: #8b5cf6;">
+                                {{ product.category.name }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if product.discountPrice %}
+                            <span class="text-decoration-line-through text-secondary small">{{ product.price }} €</span>
+                            <br>
+                            <strong class="text-gradient">{{ product.discountPrice }} €</strong>
+                            {% else %}
+                            <strong>{{ product.price }} €</strong>
+                            {% endif %}
+                        </td>
+                        <td>{{ product.totalStock }} unités</td>
+                        <td>
+                            {% if product.isFeatured %}
+                            <span class="badge bg-warning">Vedette</span>
+                            {% endif %}
+                            {% if product.isNewArrival %}
+                            <span class="badge bg-success">Nouveau</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ path('app_product_detail', {slug: product.slug}) }}"
+                                   class="btn btn-outline-info" target="_blank"
+                                   title="Voir le produit">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ path('admin_product_variants', {productId: product.id}) }}"
+                                   class="btn btn-outline-warning"
+                                   title="Gérer les variants">
+                                    <i class="bi bi-palette"></i>
+                                </a>
+                                <a href="{{ path('admin_products_edit', {id: product.id}) }}"
+                                   class="btn btn-outline-primary"
+                                   title="Modifier">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" action="{{ path('admin_products_delete', {id: product.id}) }}"
+                                      class="d-inline"
+                                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');">
+                                    <button type="submit" class="btn btn-outline-danger" title="Supprimer">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if products|length == 0 %}
+        <div class="text-center py-5">
+            <i class="bi bi-inbox display-1 text-secondary mb-3"></i>
+            <p class="text-secondary">Aucun produit</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="mt-4">
+        <a href="{{ path('admin_dashboard') }}" class="btn btn-glass">
+            <i class="bi bi-arrow-left"></i> Retour au dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

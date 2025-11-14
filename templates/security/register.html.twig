@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription - D2E SHOP{% endblock %}
+
+{% block body %}
+<div class="container py-section">
+    <div style="max-width: 600px; margin: 0 auto;">
+        <div class="card-minimal">
+            <div style="text-align: center; margin-bottom: var(--spacing-xl);">
+                <h1 class="display-4" style="margin-bottom: var(--spacing-xs);">
+                    Inscription
+                </h1>
+                <p class="text-secondary-apple">Créez votre compte D2E SHOP</p>
+            </div>
+
+            {{ form_start(registrationForm) }}
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                    <div>
+                        {{ form_label(registrationForm.firstName, 'Prénom', {'label_attr': {'class': 'form-label-apple'}}) }}
+                        {{ form_widget(registrationForm.firstName) }}
+                        {{ form_errors(registrationForm.firstName) }}
+                    </div>
+
+                    <div>
+                        {{ form_label(registrationForm.lastName, 'Nom', {'label_attr': {'class': 'form-label-apple'}}) }}
+                        {{ form_widget(registrationForm.lastName) }}
+                        {{ form_errors(registrationForm.lastName) }}
+                    </div>
+                </div>
+
+                <div style="margin-bottom: var(--spacing-md);">
+                    {{ form_label(registrationForm.email, 'Email', {'label_attr': {'class': 'form-label-apple'}}) }}
+                    {{ form_widget(registrationForm.email) }}
+                    {{ form_errors(registrationForm.email) }}
+                </div>
+
+                <div style="margin-bottom: var(--spacing-md);">
+                    {{ form_label(registrationForm.plainPassword.first, 'Mot de passe', {'label_attr': {'class': 'form-label-apple'}}) }}
+                    {{ form_widget(registrationForm.plainPassword.first) }}
+                    {{ form_errors(registrationForm.plainPassword.first) }}
+                    <small style="font-size: 13px; color: var(--text-secondary);">Minimum 6 caractères</small>
+                </div>
+
+                <div style="margin-bottom: var(--spacing-md);">
+                    {{ form_label(registrationForm.plainPassword.second, 'Confirmer le mot de passe', {'label_attr': {'class': 'form-label-apple'}}) }}
+                    {{ form_widget(registrationForm.plainPassword.second) }}
+                    {{ form_errors(registrationForm.plainPassword.second) }}
+                </div>
+
+                <div style="margin-bottom: var(--spacing-lg);">
+                    <label style="display: flex; align-items: start; gap: 8px; cursor: pointer;">
+                        {{ form_widget(registrationForm.agreeTerms, {'attr': {'style': 'width: 18px; height: 18px; cursor: pointer; margin-top: 2px;'}}) }}
+                        <span style="font-size: 15px; color: var(--text-secondary);">
+                            {{ form_label(registrationForm.agreeTerms) }}
+                        </span>
+                    </label>
+                    {{ form_errors(registrationForm.agreeTerms) }}
+                </div>
+
+                <button type="submit" class="btn-apple btn-apple-primary btn-apple-lg" style="width: 100%; margin-bottom: var(--spacing-md);">
+                    Créer mon compte
+                </button>
+
+                <div style="text-align: center;">
+                    <p style="color: var(--text-secondary); margin: 0;">
+                        Déjà un compte ?
+                        <a href="{{ path('app_login') }}" style="color: var(--accent-blue); text-decoration: none; font-weight: 500;">
+                            Connectez-vous
+                        </a>
+                    </p>
+                </div>
+            {{ form_end(registrationForm) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

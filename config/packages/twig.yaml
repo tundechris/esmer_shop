@@ -1,0 +1,11 @@
+twig:
+    file_name_pattern: '*.twig'
+    form_themes:
+        - 'form/apple_form_theme.html.twig'
+    globals:
+        kkiapay_public_key: '%env(KKIAPAY_PUBLIC_KEY)%'
+        kkiapay_sandbox: '%env(bool:KKIAPAY_SANDBOX)%'
+
+when@test:
+    twig:
+        strict_variables: true

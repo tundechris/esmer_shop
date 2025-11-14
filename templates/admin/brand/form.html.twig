@@ -1,0 +1,84 @@
+{% extends 'admin_base.html.twig' %}
+
+{% block title %}{{ isEdit ? 'Modifier' : 'Nouvelle' }} Marque - Admin{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <h1 class="display-5 fw-bold mb-5">
+        <i class="bi bi-award"></i>
+        {{ isEdit ? 'Modifier' : 'Nouvelle' }} <span class="text-gradient">Marque</span>
+    </h1>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="glass-card p-4">
+                {{ form_start(form) }}
+
+                <div class="mb-3">
+                    {{ form_label(form.name, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.name, {'attr': {'class': 'form-control form-control-glass'}}) }}
+                    {{ form_errors(form.name) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.description, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.description, {'attr': {'class': 'form-control form-control-glass', 'rows': 4}}) }}
+                    {{ form_errors(form.description) }}
+                    <small class="text-secondary">Description qui apparaîtra sur la page de la marque</small>
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.logo, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.logo, {'attr': {'class': 'form-control form-control-glass'}}) }}
+                    {{ form_errors(form.logo) }}
+                    <small class="text-secondary">URL du logo représentant cette marque</small>
+                </div>
+
+                {% if isEdit and brand.logo %}
+                <div class="mb-3">
+                    <label class="form-label">Aperçu actuel</label>
+                    <div>
+                        <img src="{{ brand.logo }}" alt="{{ brand.name }}"
+                             class="rounded border" style="max-width: 200px; background: white; padding: 8px;">
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-glow">
+                        <i class="bi bi-check-lg"></i> {{ isEdit ? 'Enregistrer' : 'Créer' }}
+                    </button>
+                    <a href="{{ path('admin_brands_list') }}" class="btn btn-glass">
+                        Annuler
+                    </a>
+                </div>
+
+                {{ form_end(form) }}
+            </div>
+
+            {% if isEdit and brand.products|length > 0 %}
+            <div class="glass-card p-4 mt-4">
+                <h5 class="mb-3">Produits de cette marque ({{ brand.products|length }})</h5>
+                <div class="d-flex flex-column gap-2">
+                    {% for product in brand.products %}
+                    <div class="d-flex align-items-center gap-2 p-2 border border-secondary rounded">
+                        {% if product.images|length > 0 %}
+                        <img src="{{ product.images[0] }}" alt="{{ product.name }}"
+                             class="rounded" style="width: 32px; height: 32px; object-fit: cover;">
+                        {% endif %}
+                        <span>{{ product.name }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{{ path('admin_brands_list') }}" class="btn btn-glass">
+            <i class="bi bi-arrow-left"></i> Retour aux marques
+        </a>
+    </div>
+</div>
+{% endblock %}

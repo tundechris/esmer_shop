@@ -1,0 +1,93 @@
+================================================================
+  GUIDE RAPIDE NGROK - Partage du site à distance
+================================================================
+
+PREMIÈRE UTILISATION (une seule fois):
+--------------------------------------
+1. Double-cliquez sur: update_ngrok.bat
+   → Met à jour ngrok vers la dernière version (OBLIGATOIRE)
+
+2. Double-cliquez sur: check_ngrok.bat
+   → Vérifiez que tout est OK
+
+3. Double-cliquez sur: setup_ngrok.bat
+   → Suivez les instructions pour configurer votre authtoken
+   → Créez un compte sur ngrok.com si besoin (gratuit)
+
+
+À CHAQUE FOIS QUE VOUS VOULEZ PARTAGER:
+----------------------------------------
+1. Double-cliquez sur: start_symfony_server.bat
+   → Lance le serveur Symfony sur le port 8000
+   → GARDEZ CETTE FENÊTRE OUVERTE
+
+2. Double-cliquez sur: start_ngrok.bat
+   → Lance le tunnel ngrok
+   OU si problème: start_ngrok_debug.bat
+
+3. Une fenêtre s'ouvre avec des informations comme:
+
+   Forwarding    https://abcd-1234-efgh.ngrok-free.app -> http://localhost:8000
+
+4. COPIEZ l'URL qui commence par "https://"
+   Exemple: https://abcd-1234-efgh.ngrok-free.app
+
+5. PARTAGEZ cette URL à la personne
+
+6. GARDEZ LA FENÊTRE OUVERTE tant qu'elle doit accéder au site
+
+
+DÉPANNAGE:
+----------
+❌ Erreur "ERR_NGROK_121" (version trop ancienne):
+   → Lancez update_ngrok.bat pour mettre à jour ngrok
+   → Puis relancez setup_ngrok.bat
+
+❌ La fenêtre se ferme immédiatement:
+   → Lancez check_ngrok.bat pour diagnostiquer
+   → Vérifiez que vous avez configuré l'authtoken (setup_ngrok.bat)
+
+❌ Erreur "ERR_NGROK_108":
+   → Vous n'avez pas configuré l'authtoken
+   → Lancez setup_ngrok.bat
+
+❌ "Connection refused":
+   → Vous n'avez pas lancé start_symfony_server.bat en premier
+   → Lancez-le d'abord, puis relancez start_ngrok.bat
+
+❌ Le site ne s'affiche pas correctement:
+   → Videz le cache Symfony: php bin/console cache:clear
+
+
+FICHIERS DISPONIBLES:
+---------------------
+✓ start_symfony_server.bat → Lance le serveur Symfony (à lancer en 1er)
+✓ update_ngrok.bat         → Met à jour ngrok vers la dernière version
+✓ check_ngrok.bat          → Diagnostique les problèmes
+✓ setup_ngrok.bat          → Configuration initiale (authtoken)
+✓ start_ngrok.bat          → Démarrage rapide du tunnel
+✓ start_ngrok_debug.bat    → Démarrage avec plus d'options
+✓ NGROK_GUIDE.md           → Guide complet détaillé
+
+
+LIMITATIONS COMPTE GRATUIT:
+---------------------------
+⏰ L'URL change à chaque redémarrage
+📊 40 connexions/minute maximum
+⏱️  Session expire après 8h d'inactivité
+
+
+IMPORTANT:
+----------
+🔒 Ne partagez l'URL qu'avec des personnes de confiance
+⏹️  Fermez ngrok quand vous n'en avez plus besoin (Ctrl+C)
+💾 Lancez TOUJOURS start_symfony_server.bat EN PREMIER
+📂 Gardez les 2 fenêtres ouvertes (serveur + ngrok)
+
+
+BESOIN D'AIDE?
+--------------
+Documentation: https://ngrok.com/docs
+Support: Ouvrez NGROK_GUIDE.md pour plus de détails
+
+================================================================

@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ma Wishlist - Esmer Shop{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <h1 class="display-4 fw-bold mb-5">
+        <i class="bi bi-heart"></i> Ma <span class="text-gradient">Wishlist</span>
+    </h1>
+
+    <div class="glass-card p-4">
+        <div class="text-center py-5">
+            <i class="bi bi-heart display-1 text-secondary mb-3"></i>
+            <p class="text-secondary">Votre wishlist est vide</p>
+            <a href="{{ path('app_products') }}" class="btn btn-primary-glow mt-3">
+                <i class="bi bi-shop"></i> Découvrir nos produits
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

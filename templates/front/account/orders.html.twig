@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Commandes - D2E SHOP{% endblock %}
+
+{% block body %}
+<div class="container py-section">
+    <h1 class="display-4" style="margin-bottom: var(--spacing-xl);">
+        Mes <span class="text-blue-apple">Commandes</span>
+    </h1>
+
+    {% if orders|length > 0 %}
+        <div style="display: grid; gap: var(--spacing-md);">
+            {% for order in orders %}
+                <div class="card-minimal">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--spacing-md);">
+                        <div>
+                            <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;">
+                                {{ order.createdAt|date('d/m/Y à H:i') }}
+                            </div>
+                            <div style="font-size: 19px; font-weight: 600;">{{ order.orderNumber }}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            {% if order.status == 'pending' %}
+                                <span class="badge-apple badge-apple-blue">En cours</span>
+                            {% elseif order.status == 'processing' %}
+                                <span class="badge-apple badge-apple-blue">En préparation</span>
+                            {% elseif order.status == 'shipped' %}
+                                <span class="badge-apple badge-apple-blue">Expédiée</span>
+                            {% elseif order.status == 'delivered' %}
+                                <span class="badge-apple badge-apple-green">Livrée</span>
+                            {% else %}
+                                <span class="badge-apple badge-apple-gray">{{ order.status }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="divider-apple"></div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--spacing-md);">
+                        <div>
+                            <div style="font-size: 13px; color: var(--text-secondary);">{{ order.items|length }} article(s)</div>
+                            <div style="font-size: 21px; font-weight: 600; color: var(--accent-blue);">{{ order.total }} €</div>
+                        </div>
+                        <a href="{{ path('app_order_detail', {id: order.id}) }}" class="btn-apple btn-apple-secondary">
+                            Voir détails
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card-minimal no-hover" style="text-align: center; padding: var(--spacing-2xl);">
+            <i class="bi bi-inbox" style="font-size: 64px; color: var(--text-tertiary); margin-bottom: var(--spacing-md);"></i>
+            <h3 style="margin-bottom: var(--spacing-sm);">Aucune commande</h3>
+            <p class="text-secondary-apple">Vous n'avez pas encore passé de commande</p>
+            <a href="{{ path('app_products') }}" class="btn-apple btn-apple-primary" style="margin-top: var(--spacing-md);">
+                Découvrir nos produits
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

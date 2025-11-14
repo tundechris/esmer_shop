@@ -1,0 +1,407 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ product.name }} - D2E SHOP{% endblock %}
+
+{% block head_js %}
+<style>
+.product-detail-image-container {
+    position: relative !important;
+    margin-bottom: 24px !important;
+    height: 400px !important;
+    max-height: 400px !important;
+    min-height: 400px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #f5f5f7 !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+}
+
+.product-detail-main-image {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+}
+
+.color-selector-btn {
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 50% !important;
+    border: 3px solid transparent !important;
+    padding: 5px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    background: white !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.color-selector-btn:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.color-selector-btn.selected {
+    border-color: var(--accent-blue) !important;
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1) !important;
+}
+
+.color-swatch {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+}
+
+.slider-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.slider-nav-btn:hover {
+    background: white;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.slider-nav-btn.prev {
+    left: 16px;
+}
+
+.slider-nav-btn.next {
+    right: 16px;
+}
+
+.slider-indicators {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    padding-top: 16px;
+}
+
+.slider-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #d1d1d6;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.slider-dot.active {
+    background: var(--accent-blue);
+    width: 24px;
+    border-radius: 4px;
+}
+
+.slider-dot:hover {
+    background: #a1a1a6;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+    .product-detail-grid {
+        grid-template-columns: 1fr !important;
+        gap: var(--spacing-xl) !important;
+    }
+
+    .product-detail-image-container {
+        height: 350px !important;
+        max-height: 350px !important;
+        min-height: 350px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .product-detail-grid .card-minimal {
+        position: relative !important;
+        top: auto !important;
+    }
+
+    .product-detail-image-container {
+        height: 300px !important;
+        max-height: 300px !important;
+        min-height: 300px !important;
+    }
+
+    .slider-nav-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .slider-nav-btn.prev {
+        left: 8px;
+    }
+
+    .slider-nav-btn.next {
+        right: 8px;
+    }
+
+    .color-selector-btn {
+        width: 50px !important;
+        height: 50px !important;
+    }
+
+    .product-quantity-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
+
+<script>
+// Données du produit disponibles globalement
+window.productData = {
+    productId: {{ product.id }},
+    firstImage: '{{ product.images[0]|e('js') }}',
+    images: {{ product.images|json_encode|raw }},
+    variants: {{ variantsData|raw }}
+};
+</script>
+<script src="{{ asset('js/product-detail.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+<div class="container py-section" x-data="productDetail">
+    {# Breadcrumb #}
+    <nav style="margin-bottom: var(--spacing-lg);">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 15px;">
+            <a href="{{ path('app_home') }}" style="color: var(--text-secondary); text-decoration: none;">Accueil</a>
+            <span style="color: var(--text-tertiary);">/</span>
+            <a href="{{ path('app_products') }}" style="color: var(--text-secondary); text-decoration: none;">Produits</a>
+            <span style="color: var(--text-tertiary);">/</span>
+            <span style="color: var(--text-primary);">{{ product.name }}</span>
+        </div>
+    </nav>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-2xl); margin-bottom: var(--spacing-2xl);" class="product-detail-grid">
+        {# Images #}
+        <div>
+            <div class="card-minimal no-hover" style="position: sticky; top: 100px;">
+                <div class="product-detail-image-container">
+                    {% if product.isNewArrival %}
+                    <div class="product-badge new">Nouveau</div>
+                    {% elseif product.discountPrice %}
+                    <div class="product-badge sale">-{{ (((product.price - product.discountPrice) / product.price) * 100)|round }}%</div>
+                    {% endif %}
+
+                    {# Image principale avec transition #}
+                    <img :src="currentImage"
+                         alt="{{ product.name }}"
+                         class="product-detail-main-image"
+                         x-transition:enter="transition ease-out duration-300"
+                         x-transition:enter-start="opacity-0 transform scale-95"
+                         x-transition:enter-end="opacity-100 transform scale-100">
+
+                    {% if product.images|length > 1 %}
+                    {# Flèches de navigation #}
+                    <button @click="prevImage()" class="slider-nav-btn prev" title="Image précédente">
+                        <i class="bi bi-chevron-left" style="font-size: 20px; color: var(--text-primary);"></i>
+                    </button>
+                    <button @click="nextImage()" class="slider-nav-btn next" title="Image suivante">
+                        <i class="bi bi-chevron-right" style="font-size: 20px; color: var(--text-primary);"></i>
+                    </button>
+                    {% endif %}
+                </div>
+
+                {% if product.images|length > 1 %}
+                {# Indicateurs de pagination #}
+                <div class="slider-indicators">
+                    <template x-for="(image, index) in images" :key="index">
+                        <button @click="goToImage(index)"
+                                class="slider-dot"
+                                :class="currentImageIndex === index ? 'active' : ''"
+                                :title="'Image ' + (index + 1)"></button>
+                    </template>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# Détails #}
+        <div>
+            <div style="margin-bottom: var(--spacing-sm);">
+                <span class="badge-apple badge-apple-blue">{{ product.brand.name }}</span>
+                <span class="badge-apple badge-apple-gray">{{ product.category.name }}</span>
+            </div>
+
+            <h1 class="display-4" style="margin-bottom: var(--spacing-md);">{{ product.name }}</h1>
+
+            <div style="margin-bottom: var(--spacing-lg);">
+                {% if product.discountPrice %}
+                <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                    <span style="text-decoration: line-through; color: var(--text-tertiary); font-size: 24px;">{{ product.price }} €</span>
+                    <span style="font-size: 48px; font-weight: 700; color: var(--accent-blue);">{{ product.finalPrice }} €</span>
+                </div>
+                {% else %}
+                <span style="font-size: 48px; font-weight: 700; color: var(--text-primary);">{{ product.price }} €</span>
+                {% endif %}
+            </div>
+
+            <p style="font-size: 17px; color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--spacing-xl);">
+                {{ product.description }}
+            </p>
+
+            {# Sélection Couleur #}
+            <div style="margin-bottom: var(--spacing-lg);">
+                <h3 style="font-size: 17px; font-weight: 600; margin-bottom: var(--spacing-sm);">
+                    Couleur: <span style="color: var(--accent-blue);" x-text="selectedColor || 'Choisissez une couleur'"></span>
+                </h3>
+                <div style="display: flex; gap: var(--spacing-md); flex-wrap: wrap;">
+                    {% set colors = {} %}
+                    {% for variant in product.variants %}
+                        {% set colors = colors|merge({(variant.color): variant.colorCode}) %}
+                    {% endfor %}
+                    {% for color, colorCode in colors %}
+                    <button type="button"
+                            class="color-selector-btn"
+                            :class="selectedColor === '{{ color }}' ? 'selected' : ''"
+                            @click="selectColor('{{ color }}')"
+                            title="{{ color }}">
+                        <span class="color-swatch" style="background-color: {{ colorCode }}; {% if color == 'Blanc' or 'white' in color|lower %}border: 1px solid #e5e5e7;{% endif %}"></span>
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# Sélection Taille #}
+            <div style="margin-bottom: var(--spacing-lg);">
+                <h3 style="font-size: 17px; font-weight: 600; margin-bottom: var(--spacing-sm);">
+                    Taille: <span style="color: var(--accent-blue);" x-text="selectedSize ? 'EU ' + selectedSize : 'Choisissez une taille'"></span>
+                </h3>
+                <div style="display: flex; gap: var(--spacing-xs); flex-wrap: wrap;">
+                    <template x-for="size in availableSizes" :key="size">
+                        <button type="button"
+                                class="btn-apple"
+                                :class="selectedSize === size ? 'btn-apple-primary' : 'btn-apple-secondary'"
+                                @click="selectSize(size)"
+                                x-text="'EU ' + size"></button>
+                    </template>
+                </div>
+            </div>
+
+            {# Stock #}
+            <div style="margin-bottom: var(--spacing-lg);" x-show="selectedSize && selectedColor">
+                <div class="alert-apple" :class="stockStatus.class">
+                    <i class="bi" :class="stockStatus.icon"></i>
+                    <span x-text="stockStatus.message"></span>
+                </div>
+            </div>
+
+            {# Quantité et Panier #}
+            <div class="product-quantity-grid" style="display: grid; grid-template-columns: 140px 1fr; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                <div>
+                    <label class="form-label-apple">Quantité</label>
+                    <div style="display: flex; border: 1px solid var(--border-light); border-radius: var(--radius-md); overflow: hidden;">
+                        <button class="btn-apple-icon" type="button" @click="quantity > 1 && quantity--">
+                            <i class="bi bi-dash"></i>
+                        </button>
+                        <input type="number" class="form-control-apple" style="text-align: center; border: none; border-left: 1px solid var(--border-light); border-right: 1px solid var(--border-light);"
+                               x-model="quantity" min="1" :max="currentStock">
+                        <button class="btn-apple-icon" type="button"
+                                @click="quantity < currentStock && quantity++"
+                                :disabled="quantity >= currentStock">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: end;">
+                    <button class="btn-apple btn-apple-primary btn-apple-lg" style="width: 100%;"
+                            @click="addToCart()"
+                            :disabled="!selectedSize || !selectedColor || currentStock === 0">
+                        <i class="bi bi-bag-plus"></i> Ajouter au panier
+                    </button>
+                </div>
+            </div>
+
+            {# Wishlist #}
+            <div style="margin-bottom: var(--spacing-xl);">
+                <button class="btn-apple btn-apple-secondary" style="width: 100%;" @click="toggleWishlist()">
+                    <i class="bi bi-heart"></i> Ajouter à la wishlist
+                </button>
+            </div>
+
+            {# Infos supplémentaires #}
+            <div class="card-minimal no-hover" style="background: var(--bg-secondary);">
+                <div style="display: flex; gap: var(--spacing-md); margin-bottom: var(--spacing-md); padding-bottom: var(--spacing-md); border-bottom: 1px solid var(--border-light);">
+                    <i class="bi bi-truck" style="font-size: 24px; color: var(--accent-blue);"></i>
+                    <div>
+                        <div style="font-weight: 600; margin-bottom: 4px;">Livraison gratuite</div>
+                        <p style="font-size: 13px; color: var(--text-secondary); margin: 0;">À partir de 50€ d'achat</p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: var(--spacing-md); margin-bottom: var(--spacing-md); padding-bottom: var(--spacing-md); border-bottom: 1px solid var(--border-light);">
+                    <i class="bi bi-arrow-repeat" style="font-size: 24px; color: var(--accent-blue);"></i>
+                    <div>
+                        <div style="font-weight: 600; margin-bottom: 4px;">Retours faciles</div>
+                        <p style="font-size: 13px; color: var(--text-secondary); margin: 0;">30 jours pour changer d'avis</p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: var(--spacing-md);">
+                    <i class="bi bi-shield-check" style="font-size: 24px; color: var(--accent-blue);"></i>
+                    <div>
+                        <div style="font-weight: 600; margin-bottom: 4px;">Paiement sécurisé</div>
+                        <p style="font-size: 13px; color: var(--text-secondary); margin: 0;">Transactions 100% sécurisées</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Produits similaires #}
+    {% if similarProducts|length > 0 %}
+    <section style="padding-top: var(--spacing-2xl); border-top: 1px solid var(--border-light);">
+        <h2 class="display-5" style="margin-bottom: var(--spacing-xl);">
+            Produits <span class="text-blue-apple">Similaires</span>
+        </h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--spacing-lg);">
+            {% for similar in similarProducts %}
+                <div class="product-card-apple scroll-reveal">
+                    {% if similar.isNewArrival %}
+                    <div class="product-badge new">Nouveau</div>
+                    {% endif %}
+
+                    <div class="product-image-wrapper">
+                        <a href="{{ path('app_product_detail', {slug: similar.slug}) }}">
+                            <img src="{{ similar.images[0] }}" alt="{{ similar.name }}" class="product-image">
+                        </a>
+                    </div>
+
+                    <div class="product-content">
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;">
+                            {{ similar.brand.name }}
+                        </div>
+                        <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 8px;">
+                            <a href="{{ path('app_product_detail', {slug: similar.slug}) }}" style="color: var(--text-primary); text-decoration: none;">
+                                {{ similar.name }}
+                            </a>
+                        </h3>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="font-size: 21px; font-weight: 600; color: var(--text-primary);">{{ similar.finalPrice }} €</div>
+                            <a href="{{ path('app_product_detail', {slug: similar.slug}) }}" class="btn-apple btn-apple-secondary btn-apple-sm">
+                                Voir
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

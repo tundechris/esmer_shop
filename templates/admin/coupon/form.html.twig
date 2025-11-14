@@ -1,0 +1,159 @@
+{% extends 'admin_base.html.twig' %}
+
+{% block title %}{{ isEdit ? 'Modifier' : 'Nouveau' }} Coupon - Admin{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <h1 class="display-5 fw-bold mb-5">
+        <i class="bi bi-ticket-perforated"></i>
+        {{ isEdit ? 'Modifier' : 'Nouveau' }} <span class="text-gradient">Coupon</span>
+    </h1>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="glass-card p-4">
+                {{ form_start(form) }}
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(form.code, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.code) }}
+                        {{ form_help(form.code) }}
+                        {{ form_errors(form.code) }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(form.type, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.type) }}
+                        {{ form_errors(form.type) }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.value, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.value) }}
+                    {{ form_help(form.value) }}
+                    {{ form_errors(form.value) }}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(form.minPurchaseAmount, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.minPurchaseAmount) }}
+                        {{ form_help(form.minPurchaseAmount) }}
+                        {{ form_errors(form.minPurchaseAmount) }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(form.maxDiscountAmount, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.maxDiscountAmount) }}
+                        {{ form_help(form.maxDiscountAmount) }}
+                        {{ form_errors(form.maxDiscountAmount) }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.usageLimit, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.usageLimit) }}
+                    {{ form_help(form.usageLimit) }}
+                    {{ form_errors(form.usageLimit) }}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(form.validFrom, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.validFrom) }}
+                        {{ form_errors(form.validFrom) }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(form.validUntil, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.validUntil) }}
+                        {{ form_errors(form.validUntil) }}
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 pt-3 border-top">
+                    <button type="submit" class="btn btn-primary-glow">
+                        <i class="bi bi-check-lg"></i> {{ isEdit ? 'Enregistrer' : 'Créer' }}
+                    </button>
+                    <a href="{{ path('admin_coupons_list') }}" class="btn btn-glass">
+                        Annuler
+                    </a>
+                </div>
+
+                {{ form_end(form) }}
+            </div>
+
+            {% if isEdit %}
+            <div class="glass-card p-4 mt-4">
+                <h5 class="mb-3">Statistiques d'utilisation</h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="p-3 rounded" style="background: rgba(59, 130, 246, 0.1);">
+                            <div class="text-secondary small">Utilisations</div>
+                            <div class="h3 mb-0">
+                                {{ coupon.usageCount }}
+                                {% if coupon.usageLimit %}
+                                    / {{ coupon.usageLimit }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="p-3 rounded" style="background: rgba(16, 185, 129, 0.1);">
+                            <div class="text-secondary small">Statut</div>
+                            <div class="h5 mb-0 mt-2">
+                                {% if coupon.isValid() %}
+                                    <span class="badge bg-success">Valide</span>
+                                {% elseif not coupon.isActive %}
+                                    <span class="badge bg-secondary">Inactif</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Expiré</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="p-3 rounded" style="background: rgba(139, 92, 246, 0.1);">
+                            <div class="text-secondary small">Créé le</div>
+                            <div class="mb-0 mt-2">{{ coupon.createdAt|date('d/m/Y') }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            <div class="glass-card p-4">
+                <h5 class="mb-3">Aide</h5>
+                <div class="small">
+                    <div class="mb-3">
+                        <strong><i class="bi bi-info-circle"></i> Type de réduction</strong>
+                        <p class="text-secondary mb-0">Choisissez entre un pourcentage (ex: 10%) ou un montant fixe (ex: 5€).</p>
+                    </div>
+                    <div class="mb-3">
+                        <strong><i class="bi bi-cart"></i> Montant minimum</strong>
+                        <p class="text-secondary mb-0">Si défini, le coupon ne sera valide que pour les commandes dépassant ce montant.</p>
+                    </div>
+                    <div class="mb-3">
+                        <strong><i class="bi bi-shield-check"></i> Limite d'utilisation</strong>
+                        <p class="text-secondary mb-0">Nombre de fois que le coupon peut être utilisé au total (tous utilisateurs confondus).</p>
+                    </div>
+                    <div class="mb-0">
+                        <strong><i class="bi bi-calendar-range"></i> Période de validité</strong>
+                        <p class="text-secondary mb-0">Définissez les dates de début et de fin de validité du coupon.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{{ path('admin_coupons_list') }}" class="btn btn-glass">
+            <i class="bi bi-arrow-left"></i> Retour aux coupons
+        </a>
+    </div>
+</div>
+{% endblock %}

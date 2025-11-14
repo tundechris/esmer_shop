@@ -1,0 +1,112 @@
+{% extends 'admin_base.html.twig' %}
+
+{% block title %}Gestion des Commandes - Admin{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1 class="display-5 fw-bold">
+            <i class="bi bi-receipt"></i> Gestion des <span class="text-gradient">Commandes</span>
+        </h1>
+    </div>
+
+    <div class="glass-card p-4">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>N° Commande</th>
+                        <th>Client</th>
+                        <th>Montant</th>
+                        <th>Articles</th>
+                        <th>Paiement</th>
+                        <th>Statut</th>
+                        <th>Date</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>
+                            <strong class="text-gradient">{{ order.orderNumber }}</strong>
+                        </td>
+                        <td>
+                            <div><strong>{{ order.user.fullName }}</strong></div>
+                            <small class="text-secondary">{{ order.user.email }}</small>
+                        </td>
+                        <td>
+                            <strong>{{ order.total }} €</strong>
+                        </td>
+                        <td>
+                            <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6;">
+                                {{ order.items|length }} article(s)
+                            </span>
+                        </td>
+                        <td>
+                            <div>
+                                {% if order.paymentStatus == 'paid' %}
+                                    <span class="badge bg-success">Payé</span>
+                                {% elseif order.paymentStatus == 'pending' %}
+                                    <span class="badge bg-warning">En attente</span>
+                                {% elseif order.paymentStatus == 'failed' %}
+                                    <span class="badge bg-danger">Échoué</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ order.paymentStatus }}</span>
+                                {% endif %}
+                            </div>
+                            <small class="text-secondary">
+                                {% if order.paymentMethod == 'kkiapay' %}
+                                    KKiaPay
+                                {% elseif order.paymentMethod == 'cash_on_delivery' %}
+                                    Paiement à la livraison
+                                {% else %}
+                                    {{ order.paymentMethod ?? 'N/A' }}
+                                {% endif %}
+                            </small>
+                        </td>
+                        <td>
+                            {% if order.status == 'pending' %}
+                                <span class="badge bg-secondary">En attente</span>
+                            {% elseif order.status == 'processing' %}
+                                <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6;">En cours</span>
+                            {% elseif order.status == 'shipped' %}
+                                <span class="badge" style="background: rgba(139, 92, 246, 0.2); color: #8b5cf6;">Expédiée</span>
+                            {% elseif order.status == 'delivered' %}
+                                <span class="badge bg-success">Livrée</span>
+                            {% elseif order.status == 'cancelled' %}
+                                <span class="badge bg-danger">Annulée</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ order.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div>{{ order.createdAt|date('d/m/Y') }}</div>
+                            <small class="text-secondary">{{ order.createdAt|date('H:i') }}</small>
+                        </td>
+                        <td class="text-end">
+                            <a href="{{ path('admin_order_detail', {id: order.id}) }}" class="btn btn-outline-info btn-sm">
+                                <i class="bi bi-eye"></i> Voir
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if orders|length == 0 %}
+        <div class="text-center py-5">
+            <i class="bi bi-inbox display-1 text-secondary mb-3"></i>
+            <p class="text-secondary">Aucune commande</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="mt-4">
+        <a href="{{ path('admin_dashboard') }}" class="btn btn-glass">
+            <i class="bi bi-arrow-left"></i> Retour au dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

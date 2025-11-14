@@ -1,0 +1,132 @@
+{% extends 'admin_base.html.twig' %}
+
+{% block title %}Gestion des Clients - Admin{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1 class="display-5 fw-bold">
+            <i class="bi bi-people"></i> Gestion des <span class="text-gradient">Clients</span>
+        </h1>
+    </div>
+
+    <div class="glass-card p-4">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Client</th>
+                        <th>Email</th>
+                        <th>Téléphone</th>
+                        <th>Commandes</th>
+                        <th>Statut</th>
+                        <th>Inscription</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in clients %}
+                    <tr>
+                        <td>{{ client.id }}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white"
+                                     style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                    {{ client.firstName|first|upper }}{{ client.lastName|first|upper }}
+                                </div>
+                                <div>
+                                    <strong>{{ client.fullName }}</strong>
+                                    {% if 'ROLE_ADMIN' in client.roles %}
+                                    <span class="badge bg-warning ms-2" style="font-size: 10px;">Admin</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ client.email }}</td>
+                        <td>
+                            {% if client.phone %}
+                                <i class="bi bi-telephone"></i> {{ client.phone }}
+                            {% else %}
+                                <span class="text-secondary fst-italic">Non renseigné</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6;">
+                                {{ client.orders|length }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if client.isVerified %}
+                                <span class="badge bg-success">Vérifié</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Non vérifié</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div>{{ client.createdAt|date('d/m/Y') }}</div>
+                            <small class="text-secondary">{{ client.createdAt|date('H:i') }}</small>
+                        </td>
+                        <td class="text-end">
+                            <a href="{{ path('admin_client_detail', {id: client.id}) }}" class="btn btn-outline-info btn-sm">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if clients|length == 0 %}
+        <div class="text-center py-5">
+            <i class="bi bi-people display-1 text-secondary mb-3"></i>
+            <p class="text-secondary">Aucun client inscrit</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if clients|length > 0 %}
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="glass-card p-4 text-center">
+                <div class="display-5 fw-bold text-gradient">{{ clients|length }}</div>
+                <div class="text-secondary">Total clients</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="glass-card p-4 text-center">
+                <div class="display-5 fw-bold" style="color: #10b981;">
+                    {% set verifiedCount = 0 %}
+                    {% for client in clients %}
+                        {% if client.isVerified %}
+                            {% set verifiedCount = verifiedCount + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                    {{ verifiedCount }}
+                </div>
+                <div class="text-secondary">Clients vérifiés</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="glass-card p-4 text-center">
+                <div class="display-5 fw-bold" style="color: #8b5cf6;">
+                    {% set totalOrders = 0 %}
+                    {% for client in clients %}
+                        {% set totalOrders = totalOrders + client.orders|length %}
+                    {% endfor %}
+                    {{ totalOrders }}
+                </div>
+                <div class="text-secondary">Total commandes</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{{ path('admin_dashboard') }}" class="btn btn-glass">
+            <i class="bi bi-arrow-left"></i> Retour au dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

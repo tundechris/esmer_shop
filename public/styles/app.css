@@ -1,0 +1,233 @@
+/* ===================================
+   ESMER SHOP - LIQUID GLASS DESIGN
+   =================================== */
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+
+/* ROOT VARIABLES */
+:root {
+    --bg-dark-start: #0a0a0a;
+    --bg-dark-end: #1a1a2e;
+    --primary-violet: #8b5cf6;
+    --secondary-blue: #6366f1;
+    --accent-cyan: #06b6d4;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-bg-hover: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-border-hover: rgba(255, 255, 255, 0.2);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --text-muted: rgba(255, 255, 255, 0.5);
+    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --shadow-glass-hover: 0 12px 40px rgba(0, 0, 0, 0.4);
+    --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.3);
+    --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* BASE STYLES */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, var(--bg-dark-start) 0%, var(--bg-dark-end) 100%);
+    background-attachment: fixed;
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+/* GLASS CARD EFFECT */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    box-shadow: var(--shadow-glass), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all var(--transition-base);
+}
+
+.glass-card:hover {
+    background: var(--glass-bg-hover);
+    backdrop-filter: blur(25px);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-glass-hover), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* BUTTONS */
+.btn-glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-weight: 500;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-glass:hover {
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    color: var(--text-primary);
+}
+
+.btn-primary-glow {
+    background: linear-gradient(135deg, var(--primary-violet), var(--secondary-blue));
+    border: none;
+    color: white;
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+}
+
+.btn-primary-glow:hover {
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.6);
+    transform: translateY(-2px);
+    color: white;
+}
+
+/* FORMS */
+.form-control-glass {
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 12px;
+    color: var(--text-primary) !important;
+    transition: all var(--transition-base);
+}
+
+.form-control-glass::placeholder {
+    color: var(--text-muted);
+}
+
+.form-control-glass:focus {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: var(--primary-violet) !important;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2) !important;
+    color: var(--text-primary) !important;
+}
+
+/* NAVBAR */
+.navbar-glass {
+    background: rgba(10, 10, 10, 0.8) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--glass-border);
+    transition: all var(--transition-base);
+}
+
+.navbar-glass.scrolled {
+    background: rgba(10, 10, 10, 0.95) !important;
+    backdrop-filter: blur(25px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.nav-link {
+    color: var(--text-secondary) !important;
+    transition: color var(--transition-base);
+}
+
+.nav-link:hover {
+    color: var(--text-primary) !important;
+}
+
+/* PRODUCT CARD */
+.product-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all var(--transition-base);
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-glass-hover), var(--shadow-glow);
+    border-color: var(--glass-border-hover);
+}
+
+.product-card-image {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.product-card:hover .product-card-image {
+    transform: scale(1.05);
+}
+
+.product-card-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: linear-gradient(135deg, var(--primary-violet), var(--secondary-blue));
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* BADGE */
+.badge-glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+/* MODAL */
+.modal-content {
+    background: var(--glass-bg);
+    backdrop-filter: blur(30px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    color: var(--text-primary);
+}
+
+.modal-header, .modal-footer {
+    border-color: var(--glass-border);
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.5);
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.7);
+}
+
+/* UTILITY */
+.text-gradient {
+    background: linear-gradient(135deg, var(--primary-violet), var(--accent-cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}

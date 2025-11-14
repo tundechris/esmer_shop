@@ -1,0 +1,272 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Panier - D2E SHOP{% endblock %}
+
+{% block head_js %}
+<style>
+/* Responsive cart styles */
+@media (max-width: 1024px) {
+    .cart-main-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .cart-summary-sticky {
+        position: relative !important;
+        top: auto !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .cart-item-grid {
+        flex-direction: column !important;
+        gap: var(--spacing-md) !important;
+    }
+
+    .cart-item-image {
+        width: 100% !important;
+        height: 200px !important;
+    }
+
+    .cart-item-price {
+        text-align: left !important;
+        margin-top: var(--spacing-sm);
+    }
+
+    .cart-item-actions {
+        flex-direction: column !important;
+        width: 100%;
+    }
+
+    .cart-item-actions > div:first-child {
+        width: 100%;
+    }
+
+    .cart-item-actions button {
+        width: 100%;
+    }
+
+    .cart-footer-buttons {
+        flex-direction: column !important;
+    }
+
+    .cart-footer-buttons a,
+    .cart-footer-buttons button {
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container py-section" x-data="cartManager()">
+    <h1 class="display-4" style="margin-bottom: var(--spacing-xl);">
+        Mon <span class="text-blue-apple">Panier</span>
+    </h1>
+
+    <div class="cart-main-grid" style="display: grid; grid-template-columns: 1fr 400px; gap: var(--spacing-xl);">
+        <div>
+            {% if cart.items|length > 0 %}
+                <div class="card-minimal" style="margin-bottom: var(--spacing-lg);">
+                    <h2 style="font-size: 21px; font-weight: 600; margin-bottom: var(--spacing-md);">
+                        Articles ({{ cart.totalItems }})
+                    </h2>
+
+                    {% for item in cart.items %}
+                    <div class="cart-item-grid" style="display: flex; gap: var(--spacing-md); padding-bottom: var(--spacing-md); margin-bottom: var(--spacing-md); {% if not loop.last %}border-bottom: 1px solid var(--border-light);{% endif %}">
+                        <div style="flex-shrink: 0;">
+                            <img class="cart-item-image" src="{{ item.variant.product.images[0] }}"
+                                 alt="{{ item.variant.product.name }}"
+                                 style="width: 100px; height: 100px; object-fit: cover; border-radius: var(--radius-md);">
+                        </div>
+                        <div style="flex: 1;">
+                            <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">
+                                <a href="{{ path('app_product_detail', {slug: item.variant.product.slug}) }}"
+                                   style="color: var(--text-primary); text-decoration: none;">
+                                    {{ item.variant.product.name }}
+                                </a>
+                            </h3>
+                            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">
+                                {{ item.variant.product.brand.name }}
+                            </p>
+                            <div style="margin-bottom: var(--spacing-sm);">
+                                <span class="badge-apple badge-apple-gray">Taille: {{ item.variant.size }}</span>
+                                <span class="badge-apple badge-apple-gray">{{ item.variant.color }}</span>
+                            </div>
+                            <div class="cart-item-actions" style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                                <div style="display: flex; border: 1px solid var(--border-light); border-radius: var(--radius-md); overflow: hidden;">
+                                    <button class="btn-apple-icon" type="button"
+                                            @click="updateQuantity({{ item.id }}, Math.max(1, {{ item.quantity }} - 1))">
+                                        <i class="bi bi-dash"></i>
+                                    </button>
+                                    <input type="number" style="width: 60px; text-align: center; border: none; border-left: 1px solid var(--border-light); border-right: 1px solid var(--border-light); padding: 8px;"
+                                           value="{{ item.quantity }}" min="1" max="{{ item.variant.stock }}"
+                                           @change="updateQuantity({{ item.id }}, $event.target.value)">
+                                    <button class="btn-apple-icon" type="button"
+                                            @click="updateQuantity({{ item.id }}, Math.min({{ item.variant.stock }}, {{ item.quantity }} + 1))">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                </div>
+                                <button class="btn-apple btn-apple-secondary btn-apple-sm"
+                                        @click="removeItem({{ item.id }})">
+                                    <i class="bi bi-trash"></i> Retirer
+                                </button>
+                            </div>
+                        </div>
+                        <div class="cart-item-price" style="flex-shrink: 0; text-align: right;">
+                            <div style="font-size: 21px; font-weight: 600; color: var(--accent-blue);">{{ item.subtotal }} €</div>
+                            <div style="font-size: 13px; color: var(--text-secondary);">{{ item.priceAtAddition }} € × {{ item.quantity }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="cart-footer-buttons" style="display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
+                        <a href="{{ path('app_products') }}" class="btn-apple btn-apple-secondary">
+                            <i class="bi bi-arrow-left"></i> Continuer mes achats
+                        </a>
+                        <button class="btn-apple btn-apple-secondary" style="margin-left: auto;" @click="clearCart()">
+                            <i class="bi bi-trash"></i> Vider le panier
+                        </button>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card-minimal no-hover" style="text-align: center; padding: var(--spacing-2xl);">
+                    <i class="bi bi-cart-x" style="font-size: 64px; color: var(--text-tertiary); margin-bottom: var(--spacing-md);"></i>
+                    <h3 style="margin-bottom: var(--spacing-sm);">Votre panier est vide</h3>
+                    <p class="text-secondary-apple">Découvrez nos produits et ajoutez-les à votre panier</p>
+                    <a href="{{ path('app_products') }}" class="btn-apple btn-apple-primary" style="margin-top: var(--spacing-md);">
+                        <i class="bi bi-shop"></i> Voir les produits
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <div>
+            <div class="card-minimal no-hover cart-summary-sticky" style="position: sticky; top: 100px;">
+                <h3 style="font-size: 19px; font-weight: 600; margin-bottom: var(--spacing-md);">Récapitulatif</h3>
+
+                {% set subtotal = cart.total %}
+                {% set shippingCost = subtotal >= 50 ? 0 : 5.99 %}
+                {% set total = subtotal + shippingCost %}
+
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span class="text-secondary-apple">Sous-total</span>
+                    <span>{{ subtotal }} €</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: var(--spacing-md);">
+                    <span class="text-secondary-apple">Livraison</span>
+                    {% if subtotal >= 50 %}
+                    <span class="text-green-apple">Gratuite</span>
+                    {% else %}
+                    <span>{{ shippingCost }} €</span>
+                    {% endif %}
+                </div>
+
+                {% if subtotal > 0 and subtotal < 50 %}
+                <div class="alert-apple alert-apple-info" style="margin-bottom: var(--spacing-md);">
+                    <i class="bi bi-info-circle"></i>
+                    Plus que {{ (50 - subtotal)|number_format(2) }} € pour la livraison gratuite!
+                </div>
+                {% endif %}
+
+                <div class="divider-apple"></div>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-md); margin-bottom: var(--spacing-lg);">
+                    <span style="font-size: 19px; font-weight: 600;">Total</span>
+                    <span style="font-size: 24px; font-weight: 700; color: var(--accent-blue);">{{ total }} €</span>
+                </div>
+
+                {% if cart.items|length > 0 %}
+                <a href="{{ path('app_checkout') }}" class="btn-apple btn-apple-primary btn-apple-lg" style="width: 100%; margin-bottom: var(--spacing-sm);">
+                    <i class="bi bi-lock"></i> Commander
+                </a>
+                <p style="text-align: center; font-size: 13px; color: var(--text-secondary); margin: 0;">
+                    Paiement 100% sécurisé
+                </p>
+                {% else %}
+                <button class="btn-apple btn-apple-primary btn-apple-lg" style="width: 100%;" disabled>
+                    <i class="bi bi-lock"></i> Commander
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function cartManager() {
+    return {
+        async updateQuantity(itemId, quantity) {
+            try {
+                const response = await fetch(`/cart/update/${itemId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ quantity: parseInt(quantity) })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    Notifications.success('Quantité mise à jour', 2000);
+                    setTimeout(() => window.location.reload(), 500);
+                } else {
+                    Notifications.error(data.message);
+                }
+            } catch (error) {
+                Notifications.error('Erreur lors de la mise à jour');
+            }
+        },
+
+        async removeItem(itemId) {
+            Notifications.confirm(
+                'Voulez-vous vraiment retirer cet article du panier ?',
+                async () => {
+                    try {
+                        const response = await fetch(`/cart/remove/${itemId}`, {
+                            method: 'POST',
+                        });
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                            Notifications.success('Article retiré du panier', 2000);
+                            setTimeout(() => window.location.reload(), 500);
+                        } else {
+                            Notifications.error(data.message);
+                        }
+                    } catch (error) {
+                        Notifications.error('Erreur lors de la suppression');
+                    }
+                }
+            );
+        },
+
+        async clearCart() {
+            Notifications.confirm(
+                'Voulez-vous vraiment vider votre panier ?',
+                async () => {
+                    try {
+                        const response = await fetch('/cart/clear', {
+                            method: 'POST',
+                        });
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                            Notifications.success('Panier vidé', 2000);
+                            setTimeout(() => window.location.reload(), 500);
+                        } else {
+                            Notifications.error('Erreur lors du vidage du panier');
+                        }
+                    } catch (error) {
+                        Notifications.error('Erreur lors du vidage du panier');
+                    }
+                }
+            );
+        }
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,206 @@
+{% extends 'admin_base.html.twig' %}
+
+{% block title %}Variants de {{ product.name }} - Admin{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <a href="{{ path('admin_products_list') }}" class="btn btn-glass btn-sm mb-2">
+                <i class="bi bi-arrow-left"></i> Retour aux produits
+            </a>
+            <h1 class="display-5 fw-bold">
+                <i class="bi bi-palette"></i> Variants de <span class="text-gradient">{{ product.name }}</span>
+            </h1>
+        </div>
+    </div>
+
+    {% for message in app.flashes('success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle"></i> {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+
+    <div class="row">
+        <div class="col-lg-5">
+            <div class="glass-card p-4">
+                <h5 class="mb-3">Ajouter un variant</h5>
+                <form method="post" action="{{ path('admin_product_variant_add', {productId: product.id}) }}">
+                    <div class="mb-3">
+                        <label class="form-label">Taille</label>
+                        <input type="text" name="size" class="form-control form-control-glass" placeholder="Ex: 42" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Couleur</label>
+                        <input type="text" name="color" class="form-control form-control-glass" placeholder="Ex: Noir">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Code couleur (Hex)</label>
+                        <input type="color" name="colorCode" class="form-control form-control-color" style="height: 40px;">
+                        <small class="text-secondary">Code hexadécimal de la couleur</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Stock</label>
+                        <input type="number" name="stock" class="form-control form-control-glass" value="0" min="0" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">SKU (optionnel)</label>
+                        <input type="text" name="sku" class="form-control form-control-glass" placeholder="Ex: SHOE-42-BLK">
+                        <small class="text-secondary">Code unique du variant</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary-glow w-100">
+                        <i class="bi bi-plus-circle"></i> Ajouter le variant
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="glass-card p-4">
+                <h5 class="mb-3">Variants existants ({{ product.variants|length }})</h5>
+
+                {% if product.variants|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Taille</th>
+                                <th>Couleur</th>
+                                <th>Stock</th>
+                                <th>SKU</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for variant in product.variants %}
+                            <tr x-data="{ editing: false }">
+                                <td>
+                                    <template x-if="!editing">
+                                        <span><strong>{{ variant.size }}</strong></span>
+                                    </template>
+                                    <template x-if="editing">
+                                        <input type="text" x-model="size" class="form-control form-control-sm" value="{{ variant.size }}">
+                                    </template>
+                                </td>
+                                <td>
+                                    <template x-if="!editing">
+                                        <div class="d-flex align-items-center gap-2">
+                                            {% if variant.colorCode %}
+                                            <div style="width: 20px; height: 20px; background: {{ variant.colorCode }}; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2);"></div>
+                                            {% endif %}
+                                            <span>{{ variant.color ?? 'N/A' }}</span>
+                                        </div>
+                                    </template>
+                                    <template x-if="editing">
+                                        <div>
+                                            <input type="text" x-model="color" class="form-control form-control-sm mb-1" value="{{ variant.color }}">
+                                            <input type="color" x-model="colorCode" class="form-control form-control-sm" value="{{ variant.colorCode }}">
+                                        </div>
+                                    </template>
+                                </td>
+                                <td>
+                                    <template x-if="!editing">
+                                        <span class="badge" style="background: {{ variant.stock > 0 ? 'rgba(16, 185, 129, 0.2); color: #10b981' : 'rgba(239, 68, 68, 0.2); color: #ef4444' }};">
+                                            {{ variant.stock }} unités
+                                        </span>
+                                    </template>
+                                    <template x-if="editing">
+                                        <input type="number" x-model="stock" class="form-control form-control-sm" value="{{ variant.stock }}" min="0">
+                                    </template>
+                                </td>
+                                <td>
+                                    <template x-if="!editing">
+                                        <code class="small">{{ variant.sku ?? 'N/A' }}</code>
+                                    </template>
+                                    <template x-if="editing">
+                                        <input type="text" x-model="sku" class="form-control form-control-sm" value="{{ variant.sku }}">
+                                    </template>
+                                </td>
+                                <td class="text-end">
+                                    <template x-if="!editing">
+                                        <div class="btn-group btn-group-sm">
+                                            <button @click="editing = true; size='{{ variant.size }}'; color='{{ variant.color }}'; colorCode='{{ variant.colorCode }}'; stock={{ variant.stock }}; sku='{{ variant.sku }}'" class="btn btn-outline-primary">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <form method="post" action="{{ path('admin_product_variant_delete', {productId: product.id, id: variant.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer ce variant ?');">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </template>
+                                    <template x-if="editing">
+                                        <div class="btn-group btn-group-sm">
+                                            <form method="post" action="{{ path('admin_product_variant_update', {productId: product.id, id: variant.id}) }}" class="d-inline" @submit="$event.target.size.value = size; $event.target.color.value = color; $event.target.colorCode.value = colorCode; $event.target.stock.value = stock; $event.target.sku.value = sku;">
+                                                <input type="hidden" name="size" x-model="size">
+                                                <input type="hidden" name="color" x-model="color">
+                                                <input type="hidden" name="colorCode" x-model="colorCode">
+                                                <input type="hidden" name="stock" x-model="stock">
+                                                <input type="hidden" name="sku" x-model="sku">
+                                                <button type="submit" class="btn btn-outline-success btn-sm">
+                                                    <i class="bi bi-check"></i>
+                                                </button>
+                                            </form>
+                                            <button @click="editing = false" class="btn btn-outline-secondary btn-sm">
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </div>
+                                    </template>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox display-3 text-secondary mb-3"></i>
+                    <p class="text-secondary">Aucun variant pour ce produit</p>
+                    <p class="text-secondary small">Ajoutez des variants (taille, couleur, stock) pour ce produit</p>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if product.variants|length > 0 %}
+            <div class="glass-card p-4 mt-4">
+                <h5 class="mb-3">Statistiques</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center p-3 rounded" style="background: rgba(59, 130, 246, 0.1);">
+                            <div class="h3 mb-0 text-gradient">{{ product.variants|length }}</div>
+                            <div class="small text-secondary">Variants total</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3 rounded" style="background: rgba(16, 185, 129, 0.1);">
+                            <div class="h3 mb-0" style="color: #10b981;">{{ product.totalStock }}</div>
+                            <div class="small text-secondary">Stock total</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3 rounded" style="background: rgba(234, 179, 8, 0.1);">
+                            <div class="h3 mb-0" style="color: #eab308;">
+                                {% set uniqueSizes = [] %}
+                                {% for variant in product.variants %}
+                                    {% if variant.size not in uniqueSizes %}
+                                        {% set uniqueSizes = uniqueSizes|merge([variant.size]) %}
+                                    {% endif %}
+                                {% endfor %}
+                                {{ uniqueSizes|length }}
+                            </div>
+                            <div class="small text-secondary">Tailles disponibles</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,158 @@
+{% extends 'admin_base.html.twig' %}
+
+{% block title %}Gestion des Coupons - Admin{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1 class="display-5 fw-bold">
+            <i class="bi bi-ticket-perforated"></i> Gestion des <span class="text-gradient">Coupons</span>
+        </h1>
+        <a href="{{ path('admin_coupon_new') }}" class="btn btn-primary-glow">
+            <i class="bi bi-plus-circle"></i> Nouveau Coupon
+        </a>
+    </div>
+
+    {% for message in app.flashes('success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle"></i> {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+
+    <div class="glass-card p-4">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Type</th>
+                        <th>Valeur</th>
+                        <th>Utilisations</th>
+                        <th>Période de validité</th>
+                        <th>Statut</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for coupon in coupons %}
+                    <tr>
+                        <td>
+                            <code class="badge" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; font-size: 14px;">
+                                {{ coupon.code }}
+                            </code>
+                        </td>
+                        <td>
+                            {% if coupon.type == 'percentage' %}
+                                <span class="badge" style="background: rgba(234, 179, 8, 0.2); color: #eab308;">
+                                    <i class="bi bi-percent"></i> Pourcentage
+                                </span>
+                            {% else %}
+                                <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">
+                                    <i class="bi bi-currency-euro"></i> Montant fixe
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <strong>
+                                {% if coupon.type == 'percentage' %}
+                                    {{ coupon.value }}%
+                                {% else %}
+                                    {{ coupon.value }}€
+                                {% endif %}
+                            </strong>
+                            {% if coupon.minPurchaseAmount %}
+                                <div class="small text-secondary">
+                                    Min: {{ coupon.minPurchaseAmount }}€
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ coupon.usageCount }}
+                            {% if coupon.usageLimit %}
+                                / {{ coupon.usageLimit }}
+                            {% else %}
+                                / ∞
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="small">
+                                {% if coupon.validFrom %}
+                                    <div><i class="bi bi-calendar-check"></i> {{ coupon.validFrom|date('d/m/Y') }}</div>
+                                {% else %}
+                                    <div class="text-secondary">Pas de début</div>
+                                {% endif %}
+                                {% if coupon.validUntil %}
+                                    <div><i class="bi bi-calendar-x"></i> {{ coupon.validUntil|date('d/m/Y') }}</div>
+                                {% else %}
+                                    <div class="text-secondary">Pas de fin</div>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            {% if coupon.isValid() %}
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle"></i> Valide
+                                </span>
+                            {% elseif not coupon.isActive %}
+                                <span class="badge bg-secondary">
+                                    <i class="bi bi-pause-circle"></i> Inactif
+                                </span>
+                            {% else %}
+                                <span class="badge bg-danger">
+                                    <i class="bi bi-x-circle"></i> Expiré
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ path('admin_coupon_edit', {id: coupon.id}) }}"
+                                   class="btn btn-outline-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" action="{{ path('admin_coupon_toggle', {id: coupon.id}) }}"
+                                      class="d-inline">
+                                    <button type="submit" class="btn btn-outline-{{ coupon.isActive ? 'warning' : 'success' }}">
+                                        <i class="bi bi-{{ coupon.isActive ? 'pause' : 'play' }}-circle"></i>
+                                    </button>
+                                </form>
+                                <form method="post" action="{{ path('admin_coupon_delete', {id: coupon.id}) }}"
+                                      class="d-inline"
+                                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce coupon ?');">
+                                    <button type="submit" class="btn btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if coupons|length == 0 %}
+        <div class="text-center py-5">
+            <i class="bi bi-ticket-perforated display-1 text-secondary mb-3"></i>
+            <p class="text-secondary">Aucun coupon</p>
+            <a href="{{ path('admin_coupon_new') }}" class="btn btn-primary-glow mt-3">
+                <i class="bi bi-plus-circle"></i> Créer un coupon
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="mt-4">
+        <a href="{{ path('admin_dashboard') }}" class="btn btn-glass">
+            <i class="bi bi-arrow-left"></i> Retour au dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

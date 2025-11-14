@@ -1,0 +1,275 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Commande - D2E SHOP{% endblock %}
+
+{% block head_js %}
+<script src="https://cdn.kkiapay.me/k.js"></script>
+<style>
+/* Responsive checkout styles */
+@media (max-width: 1024px) {
+    .checkout-main-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .checkout-form-row-2 {
+        grid-template-columns: 1fr !important;
+    }
+
+    .checkout-form-city-postal {
+        grid-template-columns: 1fr !important;
+    }
+
+    .checkout-payment-buttons {
+        grid-template-columns: 1fr !important;
+    }
+
+    .checkout-summary-item {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+
+    .checkout-summary-item img {
+        width: 100% !important;
+        height: 150px !important;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .checkout-summary-price {
+        margin-top: var(--spacing-sm);
+    }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container py-section" x-data="checkoutManager()">
+    <h1 class="display-4" style="margin-bottom: var(--spacing-xl);">Finaliser la commande</h1>
+
+    <div class="checkout-main-grid" style="display: grid; grid-template-columns: 1fr 400px; gap: var(--spacing-xl);">
+        <div>
+            <form id="checkoutForm" @submit.prevent="initiatePayment()">
+                <div class="card-minimal" style="margin-bottom: var(--spacing-lg);">
+                    <h2 style="font-size: 24px; margin-bottom: var(--spacing-md);">Adresse de livraison</h2>
+
+                    <div class="checkout-form-row-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                        <div>
+                            <label class="form-label-apple">Prénom</label>
+                            <input type="text" name="firstName" class="form-control-apple" required value="{{ app.user.firstName }}" x-model="formData.firstName">
+                        </div>
+                        <div>
+                            <label class="form-label-apple">Nom</label>
+                            <input type="text" name="lastName" class="form-control-apple" required value="{{ app.user.lastName }}" x-model="formData.lastName">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: var(--spacing-md);">
+                        <label class="form-label-apple">Adresse</label>
+                        <input type="text" name="address" class="form-control-apple" required placeholder="123 Rue Example" x-model="formData.address">
+                    </div>
+
+                    <div class="checkout-form-city-postal" style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                        <div>
+                            <label class="form-label-apple">Ville</label>
+                            <input type="text" name="city" class="form-control-apple" required placeholder="Paris" x-model="formData.city">
+                        </div>
+                        <div>
+                            <label class="form-label-apple">Code postal</label>
+                            <input type="text" name="postalCode" class="form-control-apple" required placeholder="75000" x-model="formData.postalCode">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: var(--spacing-md);">
+                        <label class="form-label-apple">Téléphone</label>
+                        <input type="tel" name="phone" class="form-control-apple" required placeholder="+229 XX XX XX XX" x-model="formData.phone">
+                    </div>
+                </div>
+
+                <div class="checkout-payment-buttons" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+                    <button type="submit" class="btn-apple btn-apple-primary btn-apple-lg" :disabled="loading">
+                        <i class="bi bi-lock"></i> <span x-text="loading ? 'Traitement...' : 'Payer avec KKiaPay'"></span>
+                    </button>
+                    <button type="button" class="btn-apple btn-apple-secondary btn-apple-lg" @click="processWithoutPayment()" :disabled="loading">
+                        <i class="bi bi-cash"></i> <span>Paiement à la livraison</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div>
+            <div class="card-minimal no-hover">
+                <h3 style="font-size: 19px; margin-bottom: var(--spacing-md);">Récapitulatif</h3>
+
+                {% for item in cart.items %}
+                <div class="checkout-summary-item" style="display: flex; gap: var(--spacing-sm); padding-bottom: var(--spacing-sm); margin-bottom: var(--spacing-sm); border-bottom: 1px solid var(--border-light);">
+                    <img src="{{ item.variant.product.images[0] }}" alt="{{ item.variant.product.name }}"
+                         style="width: 60px; height: 60px; object-fit: cover; border-radius: var(--radius-sm);">
+                    <div style="flex: 1;">
+                        <div style="font-size: 15px; font-weight: 500;">{{ item.variant.product.name }}</div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">
+                            Taille {{ item.variant.size }} • {{ item.variant.color }}
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">Qté: {{ item.quantity }}</div>
+                    </div>
+                    <div class="checkout-summary-price" style="font-weight: 600;">{{ item.subtotal }} €</div>
+                </div>
+                {% endfor %}
+
+                <div style="margin-top: var(--spacing-md);">
+                    {% set subtotal = cart.total %}
+                    {% set shippingCost = subtotal >= 50 ? 0 : 5.99 %}
+                    {% set total = subtotal + shippingCost %}
+
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span class="text-secondary-apple">Sous-total</span>
+                        <span>{{ subtotal }} €</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: var(--spacing-md);">
+                        <span class="text-secondary-apple">Livraison</span>
+                        <span class="{% if shippingCost == 0 %}text-green-apple{% endif %}">
+                            {% if shippingCost == 0 %}Gratuite{% else %}{{ shippingCost }} €{% endif %}
+                        </span>
+                    </div>
+
+                    <div class="divider-apple"></div>
+
+                    <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-md);">
+                        <span style="font-size: 19px; font-weight: 600;">Total</span>
+                        <span style="font-size: 24px; font-weight: 700; color: var(--accent-blue);">{{ total }} €</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function checkoutManager() {
+    return {
+        loading: false,
+        formData: {
+            firstName: '{{ app.user.firstName }}',
+            lastName: '{{ app.user.lastName }}',
+            address: '',
+            city: '',
+            postalCode: '',
+            phone: ''
+        },
+
+        initiatePayment() {
+            // Validate form
+            const form = document.getElementById('checkoutForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            this.loading = true;
+
+            // KKiaPay configuration
+            const total = {{ total }};
+            const amount = Math.round(total * 655); // Convert EUR to XOF (1 EUR ≈ 655 XOF)
+
+            openKkiapayWidget({
+                amount: amount,
+                api_key: "{{ kkiapay_public_key|default('YOUR_KKIAPAY_PUBLIC_KEY') }}",
+                sandbox: {{ kkiapay_sandbox|default('true') }},
+                phone: this.formData.phone,
+                name: this.formData.firstName + ' ' + this.formData.lastName,
+                theme: "#007aff"
+            });
+
+            addKkiapayListener('success', (response) => {
+                this.handlePaymentSuccess(response);
+            });
+
+            addKkiapayListener('failed', (response) => {
+                this.handlePaymentFailed(response);
+            });
+
+            this.loading = false;
+        },
+
+        async handlePaymentSuccess(response) {
+            Notifications.success('Paiement réussi! Création de votre commande...', 3000);
+
+            try {
+                const checkoutResponse = await fetch('{{ path('app_checkout_process') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        ...this.formData,
+                        transactionId: response.transactionId,
+                        paymentMethod: 'kkiapay'
+                    })
+                });
+
+                const data = await checkoutResponse.json();
+
+                if (data.success) {
+                    Notifications.success('Commande créée avec succès!');
+                    setTimeout(() => {
+                        window.location.href = '/checkout/confirmation/' + data.orderNumber;
+                    }, 1000);
+                } else {
+                    Notifications.error(data.message || 'Erreur lors de la création de la commande');
+                }
+            } catch (error) {
+                console.error('Erreur checkout:', error);
+                Notifications.error('Erreur lors de la création de la commande');
+            }
+        },
+
+        handlePaymentFailed(response) {
+            this.loading = false;
+            Notifications.error('Le paiement a échoué. Veuillez réessayer.');
+            console.error('Paiement échoué:', response);
+        },
+
+        async processWithoutPayment() {
+            // Validate form
+            const form = document.getElementById('checkoutForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            this.loading = true;
+
+            try {
+                const checkoutResponse = await fetch('{{ path('app_checkout_process') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        ...this.formData,
+                        transactionId: 'COD-' + Date.now(),
+                        paymentMethod: 'cash_on_delivery'
+                    })
+                });
+
+                const data = await checkoutResponse.json();
+
+                if (data.success) {
+                    Notifications.success('Commande créée avec succès! Vous paierez à la livraison.');
+                    setTimeout(() => {
+                        window.location.href = '/checkout/confirmation/' + data.orderNumber;
+                    }, 1500);
+                } else {
+                    Notifications.error(data.message || 'Erreur lors de la création de la commande');
+                }
+            } catch (error) {
+                console.error('Erreur checkout:', error);
+                Notifications.error('Erreur lors de la création de la commande');
+            } finally {
+                this.loading = false;
+            }
+        }
+    }
+}
+</script>
+{% endblock %}

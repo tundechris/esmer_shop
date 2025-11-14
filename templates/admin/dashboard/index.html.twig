@@ -1,0 +1,192 @@
+{% extends 'admin_base.html.twig' %}
+
+{% block title %}Dashboard Admin - Esmer Shop{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4 fw-bold">
+                <i class="bi bi-speedometer2"></i> Dashboard <span class="text-gradient">Admin</span>
+            </h1>
+            <p class="text-secondary">Bienvenue {{ app.user.fullName }}</p>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="glass-card p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-secondary mb-1 small">Ventes du mois</p>
+                        <h3 class="fw-bold mb-0 text-gradient">{{ currentMonthSales|number_format(0, ',', ' ') }}€</h3>
+                    </div>
+                    <i class="bi bi-cash-stack display-4 text-secondary"></i>
+                </div>
+                <div class="mt-2">
+                    {% if salesChange > 0 %}
+                    <small class="text-success">
+                        <i class="bi bi-arrow-up"></i> +{{ salesChange|number_format(1) }}% vs mois dernier
+                    </small>
+                    {% elseif salesChange < 0 %}
+                    <small class="text-danger">
+                        <i class="bi bi-arrow-down"></i> {{ salesChange|number_format(1) }}% vs mois dernier
+                    </small>
+                    {% else %}
+                    <small class="text-secondary">
+                        <i class="bi bi-dash"></i> Aucune variation
+                    </small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="glass-card p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-secondary mb-1 small">Commandes</p>
+                        <h3 class="fw-bold mb-0 text-gradient">{{ currentMonthOrdersCount }}</h3>
+                    </div>
+                    <i class="bi bi-box-seam display-4 text-secondary"></i>
+                </div>
+                <div class="mt-2">
+                    {% if ordersChange > 0 %}
+                    <small class="text-success">
+                        <i class="bi bi-arrow-up"></i> +{{ ordersChange|number_format(1) }}% vs mois dernier
+                    </small>
+                    {% elseif ordersChange < 0 %}
+                    <small class="text-danger">
+                        <i class="bi bi-arrow-down"></i> {{ ordersChange|number_format(1) }}% vs mois dernier
+                    </small>
+                    {% else %}
+                    <small class="text-secondary">
+                        <i class="bi bi-dash"></i> Aucune variation
+                    </small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="glass-card p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-secondary mb-1 small">Produits</p>
+                        <h3 class="fw-bold mb-0 text-gradient">{{ totalProducts }}</h3>
+                    </div>
+                    <i class="bi bi-shop display-4 text-secondary"></i>
+                </div>
+                <div class="mt-2">
+                    <small class="text-secondary">
+                        <i class="bi bi-dash"></i> Total en catalogue
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="glass-card p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-secondary mb-1 small">Clients</p>
+                        <h3 class="fw-bold mb-0 text-gradient">{{ totalClients }}</h3>
+                    </div>
+                    <i class="bi bi-people display-4 text-secondary"></i>
+                </div>
+                <div class="mt-2">
+                    <small class="text-secondary">
+                        <i class="bi bi-dash"></i> Total inscrits
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-8">
+            <div class="glass-card p-4">
+                <h5 class="mb-4">Dernières commandes</h5>
+                <div class="table-responsive">
+                    <table class="table table-dark">
+                        <thead>
+                            <tr>
+                                <th>N° Commande</th>
+                                <th>Client</th>
+                                <th>Montant</th>
+                                <th>Statut</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if recentOrders|length > 0 %}
+                                {% for order in recentOrders %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ path('admin_order_detail', {id: order.id}) }}" class="text-gradient text-decoration-none">
+                                            {{ order.orderNumber }}
+                                        </a>
+                                    </td>
+                                    <td>{{ order.user.fullName }}</td>
+                                    <td><strong>{{ order.total }}€</strong></td>
+                                    <td>
+                                        {% if order.status == 'delivered' %}
+                                            <span class="badge bg-success">Livrée</span>
+                                        {% elseif order.status == 'shipped' %}
+                                            <span class="badge" style="background: rgba(139, 92, 246, 0.2); color: #8b5cf6;">Expédiée</span>
+                                        {% elseif order.status == 'processing' %}
+                                            <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6;">En cours</span>
+                                        {% elseif order.status == 'cancelled' %}
+                                            <span class="badge bg-danger">Annulée</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">En attente</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ order.createdAt|date('d/m/Y H:i') }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-secondary">
+                                    Aucune commande
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="glass-card p-4">
+                <h5 class="mb-4">Menu Admin</h5>
+                <div class="d-grid gap-2">
+                    <a href="{{ path('admin_products_list') }}" class="btn btn-glass text-start">
+                        <i class="bi bi-box-seam"></i> Produits
+                    </a>
+                    <a href="{{ path('admin_orders') }}" class="btn btn-glass text-start">
+                        <i class="bi bi-receipt"></i> Commandes
+                    </a>
+                    <a href="{{ path('admin_clients_list') }}" class="btn btn-glass text-start">
+                        <i class="bi bi-people"></i> Clients
+                    </a>
+                    <a href="{{ path('admin_categories_list') }}" class="btn btn-glass text-start">
+                        <i class="bi bi-tag"></i> Catégories
+                    </a>
+                    <a href="{{ path('admin_brands_list') }}" class="btn btn-glass text-start">
+                        <i class="bi bi-award"></i> Marques
+                    </a>
+                    <a href="{{ path('admin_coupons_list') }}" class="btn btn-glass text-start">
+                        <i class="bi bi-ticket-perforated"></i> Coupons
+                    </a>
+                </div>
+                <hr class="my-3" style="border-color: var(--glass-border);">
+                <a href="{{ path('app_home') }}" class="btn btn-outline-light w-100">
+                    <i class="bi bi-house"></i> Retour au site
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

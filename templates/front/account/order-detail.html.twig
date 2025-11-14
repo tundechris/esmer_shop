@@ -1,0 +1,119 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Commande {{ order.orderNumber }} - D2E SHOP{% endblock %}
+
+{% block body %}
+<div class="container py-section">
+    <div style="margin-bottom: var(--spacing-xl);">
+        <a href="{{ path('app_orders') }}" class="text-secondary-apple" style="text-decoration: none; font-size: 15px;">
+            <i class="bi bi-arrow-left"></i> Retour aux commandes
+        </a>
+    </div>
+
+    <h1 class="display-4" style="margin-bottom: var(--spacing-xl);">
+        Commande <span class="text-blue-apple">{{ order.orderNumber }}</span>
+    </h1>
+
+    <div style="display: grid; grid-template-columns: 1fr 400px; gap: var(--spacing-xl);">
+        <div>
+            {# Status and Date Card #}
+            <div class="card-minimal" style="margin-bottom: var(--spacing-lg);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+                    <div>
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;">Date de commande</div>
+                        <div style="font-size: 17px; font-weight: 600;">{{ order.createdAt|date('d/m/Y à H:i') }}</div>
+                    </div>
+                    <div>
+                        {% if order.status == 'pending' %}
+                            <span class="badge-apple badge-apple-blue">En cours</span>
+                        {% elseif order.status == 'processing' %}
+                            <span class="badge-apple badge-apple-blue">En préparation</span>
+                        {% elseif order.status == 'shipped' %}
+                            <span class="badge-apple badge-apple-blue">Expédiée</span>
+                        {% elseif order.status == 'delivered' %}
+                            <span class="badge-apple badge-apple-green">Livrée</span>
+                        {% else %}
+                            <span class="badge-apple badge-apple-gray">{{ order.status }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# Order Items #}
+            <div class="card-minimal" style="margin-bottom: var(--spacing-lg);">
+                <h2 style="font-size: 21px; font-weight: 600; margin-bottom: var(--spacing-md);">Articles commandés</h2>
+
+                {% for item in order.items %}
+                <div style="display: flex; gap: var(--spacing-md); padding-bottom: var(--spacing-md); margin-bottom: var(--spacing-md); {% if not loop.last %}border-bottom: 1px solid var(--border-light);{% endif %}">
+                    <img src="{{ item.productVariant.product.images[0] }}" alt="{{ item.productName }}"
+                         style="width: 80px; height: 80px; object-fit: cover; border-radius: var(--radius-sm);">
+                    <div style="flex: 1;">
+                        <div style="font-size: 17px; font-weight: 500; margin-bottom: 4px;">{{ item.productName }}</div>
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">
+                            Taille {{ item.variantSize }} • {{ item.variantColor }}
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="font-size: 13px; color: var(--text-secondary);">Quantité: {{ item.quantity }}</div>
+                            <div style="font-size: 13px; color: var(--text-secondary);">{{ item.price }} € × {{ item.quantity }}</div>
+                        </div>
+                    </div>
+                    <div style="font-weight: 600; color: var(--accent-blue); font-size: 17px;">{{ item.subtotal }} €</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {# Shipping Address #}
+            <div class="card-minimal">
+                <h2 style="font-size: 21px; font-weight: 600; margin-bottom: var(--spacing-md);">Adresse de livraison</h2>
+
+                <div style="font-size: 15px; line-height: 1.6; color: var(--text-secondary);">
+                    <div style="font-weight: 500; color: var(--text-primary); margin-bottom: 8px;">
+                        {{ order.shippingFirstName }} {{ order.shippingLastName }}
+                    </div>
+                    <div>{{ order.shippingAddress }}</div>
+                    <div>{{ order.shippingPostalCode }} {{ order.shippingCity }}</div>
+                    {% if order.shippingPhone %}
+                    <div style="margin-top: 8px;">
+                        <i class="bi bi-telephone"></i> {{ order.shippingPhone }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {# Order Summary Sidebar #}
+        <div>
+            <div class="card-minimal no-hover" style="position: sticky; top: 100px;">
+                <h3 style="font-size: 19px; font-weight: 600; margin-bottom: var(--spacing-md);">Récapitulatif</h3>
+
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span class="text-secondary-apple">Sous-total</span>
+                    <span>{{ order.subtotal }} €</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: var(--spacing-md);">
+                    <span class="text-secondary-apple">Livraison</span>
+                    <span class="{% if order.shippingCost == 0 %}text-green-apple{% endif %}">
+                        {% if order.shippingCost == 0 %}Gratuite{% else %}{{ order.shippingCost }} €{% endif %}
+                    </span>
+                </div>
+
+                <div class="divider-apple"></div>
+
+                <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-md);">
+                    <span style="font-size: 19px; font-weight: 600;">Total</span>
+                    <span style="font-size: 24px; font-weight: 700; color: var(--accent-blue);">{{ order.total }} €</span>
+                </div>
+
+                {% if order.status == 'delivered' %}
+                <div style="margin-top: var(--spacing-lg); padding: var(--spacing-md); background: rgba(52, 199, 89, 0.1); border-radius: var(--radius-md);">
+                    <div style="display: flex; align-items: center; gap: 8px; color: var(--accent-green);">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span style="font-weight: 500;">Commande livrée</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

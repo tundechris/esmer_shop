@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}D2E SHOP - Chaussures Premium{% endblock %}</title>
+
+    {# Favicon #}
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>👟</text></svg>">
+
+    {% block stylesheets %}
+        {# Bootstrap Icons #}
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+
+        {# Apple Minimalist Design #}
+        <link rel="stylesheet" href="{{ asset('styles/apple.css') }}">
+    {% endblock %}
+
+    {% block head_js %}{% endblock %}
+</head>
+<body>
+    {# Navbar #}
+    {% block navbar %}
+        {% include 'components/navbar.html.twig' %}
+    {% endblock %}
+
+    {# Flash Messages #}
+    {% for label, messages in app.flashes %}
+        <div class="container" style="padding-top: 1rem;">
+            {% for message in messages %}
+                <div class="alert-apple alert-apple-{{ label == 'success' ? 'success' : (label == 'error' ? 'error' : 'info') }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    {# Main Content #}
+    <main>
+        {% block body %}{% endblock %}
+    </main>
+
+    {# Footer #}
+    {% block footer %}
+        {% include 'components/footer.html.twig' %}
+    {% endblock %}
+
+    {% block javascripts %}
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
+
+        {# Notification System #}
+        <script src="{{ asset('js/notifications.js') }}"></script>
+
+        {# Animations Script #}
+        <script src="{{ asset('js/animations.js') }}"></script>
+
+        {# Alpine.js for interactions - chargé en DERNIER #}
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    {% endblock %}
+</body>
+</html>

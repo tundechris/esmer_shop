@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Compte - D2E SHOP{% endblock %}
+
+{% block body %}
+<div class="container py-section">
+    <h1 class="display-4" style="margin-bottom: var(--spacing-xl);">
+        Mon <span class="text-blue-apple">Compte</span>
+    </h1>
+
+    <div style="display: grid; grid-template-columns: 320px 1fr; gap: var(--spacing-xl);">
+        <div>
+            <div class="card-minimal no-hover" style="text-align: center; margin-bottom: var(--spacing-md);">
+                <i class="bi bi-person-circle" style="font-size: 80px; color: var(--accent-blue); margin-bottom: var(--spacing-md);"></i>
+                <h5 style="font-size: 19px; font-weight: 600; margin-bottom: 4px;">{{ app.user.fullName }}</h5>
+                <p style="font-size: 13px; color: var(--text-secondary); margin: 0;">{{ app.user.email }}</p>
+            </div>
+
+            <div class="card-minimal no-hover">
+                <a href="{{ path('app_account') }}" style="display: flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm); color: var(--text-primary); text-decoration: none; border-radius: var(--radius-md); transition: var(--transition-smooth);" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
+                    <i class="bi bi-person"></i> Informations personnelles
+                </a>
+                <a href="{{ path('app_orders') }}" style="display: flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm); color: var(--text-primary); text-decoration: none; border-radius: var(--radius-md); transition: var(--transition-smooth);" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
+                    <i class="bi bi-box-seam"></i> Mes commandes
+                </a>
+                <a href="{{ path('app_wishlist') }}" style="display: flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm); color: var(--text-primary); text-decoration: none; border-radius: var(--radius-md); transition: var(--transition-smooth);" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
+                    <i class="bi bi-heart"></i> Ma wishlist
+                </a>
+                <div class="divider-apple"></div>
+                <a href="{{ path('app_logout') }}" style="display: flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm); color: var(--text-primary); text-decoration: none; border-radius: var(--radius-md); transition: var(--transition-smooth);" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
+                    <i class="bi bi-box-arrow-right"></i> Déconnexion
+                </a>
+            </div>
+        </div>
+
+        <div>
+            <div class="card-minimal">
+                <h2 style="font-size: 21px; font-weight: 600; margin-bottom: var(--spacing-lg);">Informations personnelles</h2>
+                <div style="margin-bottom: var(--spacing-md);">
+                    <label class="form-label-apple">Prénom</label>
+                    <input type="text" class="form-control-apple" value="{{ app.user.firstName }}" readonly>
+                </div>
+                <div style="margin-bottom: var(--spacing-md);">
+                    <label class="form-label-apple">Nom</label>
+                    <input type="text" class="form-control-apple" value="{{ app.user.lastName }}" readonly>
+                </div>
+                <div style="margin-bottom: var(--spacing-lg);">
+                    <label class="form-label-apple">Email</label>
+                    <input type="email" class="form-control-apple" value="{{ app.user.email }}" readonly>
+                </div>
+                <button class="btn-apple btn-apple-primary">
+                    <i class="bi bi-pencil"></i> Modifier
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

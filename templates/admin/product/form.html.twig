@@ -1,0 +1,163 @@
+{% extends 'admin_base.html.twig' %}
+
+{% block title %}{{ product ? 'Modifier' : 'Nouveau' }} Produit - Admin{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <h1 class="display-5 fw-bold mb-5">
+        <i class="bi bi-box-seam"></i>
+        {{ product ? 'Modifier' : 'Nouveau' }} <span class="text-gradient">Produit</span>
+    </h1>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="glass-card p-4">
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nom du produit</label>
+                        <input type="text" class="form-control form-control-glass" id="name" name="name"
+                               value="{{ product ? product.name : '' }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control form-control-glass" id="description" name="description"
+                                  rows="4" required>{{ product ? product.description : '' }}</textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="price" class="form-label">Prix (€)</label>
+                            <input type="number" class="form-control form-control-glass" id="price" name="price"
+                                   value="{{ product ? product.price : '' }}" step="0.01" required>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label for="discountPrice" class="form-label">Prix promo (€)</label>
+                            <input type="number" class="form-control form-control-glass" id="discountPrice" name="discountPrice"
+                                   value="{{ product ? product.discountPrice : '' }}" step="0.01">
+                            <small class="text-secondary">Optionnel</small>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label for="category" class="form-label">Catégorie</label>
+                            <select class="form-select form-control-glass" id="category" name="category" required>
+                                <option value="">Choisir...</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}" {% if product and product.category.id == category.id %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="brand" class="form-label">Marque</label>
+                            <select class="form-select form-control-glass" id="brand" name="brand" required>
+                                <option value="">Choisir...</option>
+                                {% for brand in brands %}
+                                <option value="{{ brand.id }}" {% if product and product.brand.id == brand.id %}selected{% endif %}>
+                                    {{ brand.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="image" class="form-label">URL de l'image</label>
+                            <input type="url" class="form-control form-control-glass" id="image" name="image"
+                                   value="{{ product ? product.images[0] : '' }}"
+                                   placeholder="https://via.placeholder.com/600x400">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="isFeatured" name="isFeatured"
+                                   {% if product and product.isFeatured %}checked{% endif %}>
+                            <label class="form-check-label" for="isFeatured">
+                                Produit vedette (affiché sur la page d'accueil)
+                            </label>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="isNewArrival" name="isNewArrival"
+                                   {% if product and product.isNewArrival %}checked{% endif %}>
+                            <label class="form-check-label" for="isNewArrival">
+                                Nouvelle arrivée (badge "Nouveau")
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary-glow">
+                            <i class="bi bi-check-circle"></i> {{ product ? 'Modifier' : 'Créer' }}
+                        </button>
+                        <a href="{{ path('admin_products_list') }}" class="btn btn-glass">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="glass-card p-4">
+                <h5 class="mb-3">Aide</h5>
+                <ul class="list-unstyled small text-secondary">
+                    <li class="mb-2">
+                        <i class="bi bi-info-circle text-gradient"></i>
+                        Le slug sera généré automatiquement
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-info-circle text-gradient"></i>
+                        Prix promo optionnel pour les promotions
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-info-circle text-gradient"></i>
+                        Les produits "vedette" apparaissent sur la page d'accueil
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-info-circle text-gradient"></i>
+                        Badge "Nouveau" pour les nouveautés
+                    </li>
+                </ul>
+            </div>
+
+            {% if product %}
+            <div class="glass-card p-4 mt-4">
+                <h5 class="mb-3">Informations</h5>
+                <div class="small">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-secondary">ID:</span>
+                        <span>{{ product.id }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-secondary">Créé le:</span>
+                        <span>{{ product.createdAt|date('d/m/Y') }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-secondary">Variants:</span>
+                        <span class="badge" style="background: {{ product.variants|length > 0 ? 'rgba(16, 185, 129, 0.2); color: #10b981' : 'rgba(239, 68, 68, 0.2); color: #ef4444' }};">
+                            {{ product.variants|length }}
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-secondary">Stock total:</span>
+                        <span class="badge" style="background: {{ product.totalStock > 0 ? 'rgba(16, 185, 129, 0.2); color: #10b981' : 'rgba(239, 68, 68, 0.2); color: #ef4444' }};">
+                            {{ product.totalStock }}
+                        </span>
+                    </div>
+                </div>
+                <hr class="my-3" style="border-color: rgba(255, 255, 255, 0.1);">
+                <a href="{{ path('admin_product_variants', {productId: product.id}) }}" class="btn btn-outline-warning w-100">
+                    <i class="bi bi-palette"></i> Gérer les variants
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

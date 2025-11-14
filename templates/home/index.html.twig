@@ -1,0 +1,555 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}D2E SHOP - Chaussures Premium{% endblock %}
+
+{% block head_js %}
+<style>
+/* Import Footlocker-style fonts */
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto:wght@400;500;700;900&display=swap');
+
+/* Color Palette - Aligned with site */
+:root {
+    /* Using existing Apple colors from apple.css */
+    --home-primary: #1d1d1f;
+    --home-secondary: #6e6e73;
+    --home-bg: #ffffff;
+    --home-bg-alt: #f5f5f7;
+    --home-accent: #007AFF;
+    --home-accent-hover: #0051D5;
+    --home-border: #d2d2d7;
+}
+
+/* Keep body styles from apple.css */
+
+/* Hero Section - Footlocker Style with Apple Colors */
+.hero-fl {
+    position: relative;
+    min-height: 70vh;
+    background: var(--home-primary);
+    color: white;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.hero-fl::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(0, 122, 255, 0.1) 0%, rgba(0, 0, 0, 0.8) 100%);
+    z-index: 1;
+}
+
+.hero-bg-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.4;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 3rem 0;
+}
+
+.hero-label {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--home-accent);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: inline-block;
+}
+
+.hero-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    font-weight: 700;
+    line-height: 0.95;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+}
+
+.hero-title .highlight {
+    color: var(--home-accent);
+    display: block;
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 2.5rem;
+    max-width: 600px;
+    font-weight: 400;
+}
+
+.cta-group {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-fl {
+    padding: 1.1rem 3rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-fl-primary {
+    background: var(--home-accent);
+    color: white;
+}
+
+.btn-fl-primary:hover {
+    background: var(--home-accent-hover);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-fl-secondary {
+    background: white;
+    color: var(--home-primary);
+    border: 2px solid white;
+}
+
+.btn-fl-secondary:hover {
+    background: transparent;
+    color: white;
+    border-color: white;
+}
+
+/* Section Styles - Footlocker avec couleurs Apple */
+.section-fl {
+    background: var(--home-bg);
+    padding: 4rem 0;
+    margin-top: 0;
+}
+
+.section-fl.gray {
+    background: var(--home-bg-alt);
+}
+
+.section-header {
+    margin-bottom: 3rem;
+    padding: 0 1rem;
+}
+
+.section-header.center {
+    text-align: center;
+}
+
+.section-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--home-accent);
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.section-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--home-primary);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.01em;
+}
+
+/* Product Grid - Footlocker Style avec couleurs Apple */
+.product-grid-fl {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.product-card-fl {
+    position: relative;
+    background: white;
+    text-decoration: none;
+    display: block;
+    transition: all 0.3s ease;
+    border: 1px solid var(--home-border);
+    overflow: hidden;
+}
+
+.product-card-fl:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border-color: var(--home-accent);
+}
+
+.product-image-container {
+    position: relative;
+    background: var(--home-bg-alt);
+    overflow: hidden;
+    aspect-ratio: 1;
+}
+
+.product-image-fl {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.product-card-fl:hover .product-image-fl {
+    transform: scale(1.08);
+}
+
+.product-badge {
+    position: absolute;
+    top: 0.8rem;
+    left: 0.8rem;
+    background: var(--home-accent);
+    color: white;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    z-index: 2;
+}
+
+.product-badge.new {
+    background: var(--home-primary);
+}
+
+.product-info-fl {
+    padding: 1.2rem;
+}
+
+.product-brand {
+    font-size: 0.8rem;
+    color: var(--home-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.3rem;
+    font-weight: 700;
+}
+
+.product-name-fl {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+    color: var(--home-primary);
+    line-height: 1.3;
+    min-height: 2.6em;
+}
+
+.product-price-fl {
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: var(--home-primary);
+}
+
+.product-price-old {
+    font-size: 1rem;
+    text-decoration: line-through;
+    color: var(--home-secondary);
+    margin-left: 0.5rem;
+    font-weight: 400;
+}
+
+/* Featured Banner - Footlocker avec couleurs Apple */
+.featured-banner {
+    position: relative;
+    padding: 6rem 0;
+    background: var(--home-accent);
+    color: white;
+    text-align: center;
+    overflow: hidden;
+    margin: 0;
+}
+
+.featured-banner::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+}
+
+.featured-content {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    z-index: 2;
+}
+
+.featured-slogan {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+}
+
+.featured-desc {
+    font-size: 1.2rem;
+    margin-bottom: 2.5rem;
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 400;
+}
+
+/* Features Grid - Footlocker avec couleurs Apple */
+.features-fl {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem;
+    padding: 4rem 0;
+}
+
+.feature-item-fl {
+    text-align: center;
+    padding: 2rem 1rem;
+    background: white;
+    border: 2px solid var(--home-border);
+    transition: all 0.3s ease;
+}
+
+.feature-item-fl:hover {
+    border-color: var(--home-accent);
+    transform: translateY(-3px);
+}
+
+.feature-icon-fl {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--home-accent);
+}
+
+.feature-title-fl {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    color: var(--home-primary);
+}
+
+.feature-desc-fl {
+    color: var(--home-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+    .hero-title {
+        font-size: clamp(2.5rem, 8vw, 4rem);
+    }
+
+    .cta-group {
+        flex-direction: column;
+    }
+
+    .btn-fl {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .product-grid-fl {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .product-grid-fl {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .product-info-fl {
+        padding: 0.8rem;
+    }
+
+    .features-fl {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+{# Hero Section #}
+<section class="hero-fl">
+    <img src="https://images.unsplash.com/photo-1556906781-9a412961c28c?w=1920&q=80" alt="Hero Background" class="hero-bg-image">
+    <div class="container">
+        <div class="hero-content">
+            <span class="hero-label">Nouveautés</span>
+            <h1 class="hero-title">
+                Les dernières
+                <span class="highlight">Sorties</span>
+            </h1>
+            <p class="hero-subtitle">
+                Découvrez les dernières tendances et les modèles les plus exclusifs du moment. Votre style commence ici.
+            </p>
+            <div class="cta-group">
+                <a href="{{ path('app_products') }}" class="btn-fl btn-fl-primary">
+                    Acheter maintenant
+                </a>
+                <a href="#new-arrivals" class="btn-fl btn-fl-secondary">
+                    Découvrir
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# New Arrivals Section #}
+{% if newProducts|length > 0 %}
+<section id="new-arrivals" class="section-fl gray">
+    <div class="container">
+        <div class="section-header center">
+            <div class="section-label">Just Dropped</div>
+            <h2 class="section-title">Nouveautés</h2>
+        </div>
+
+        <div class="product-grid-fl">
+            {% for product in newProducts %}
+            <a href="{{ path('app_product_detail', {slug: product.slug}) }}" class="product-card-fl">
+                <div class="product-image-container">
+                    {% if product.isNewArrival %}
+                    <div class="product-badge new">New</div>
+                    {% elseif product.discountPrice %}
+                    <div class="product-badge">-{{ (((product.price - product.discountPrice) / product.price) * 100)|round }}%</div>
+                    {% endif %}
+                    <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="product-image-fl">
+                </div>
+                <div class="product-info-fl">
+                    <div class="product-brand">{{ product.brand.name }}</div>
+                    <h3 class="product-name-fl">{{ product.name }}</h3>
+                    <div>
+                        <span class="product-price-fl">{{ product.finalPrice }} €</span>
+                        {% if product.discountPrice %}
+                        <span class="product-price-old">{{ product.price }} €</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{# Featured Banner #}
+<section class="featured-banner">
+    <div class="featured-content">
+        <h2 class="featured-slogan">
+            Votre style, nos sneakers
+        </h2>
+        <p class="featured-desc">
+            Des milliers de modèles exclusifs disponibles immédiatement. Livraison express gratuite.
+        </p>
+        <a href="{{ path('app_products') }}" class="btn-fl btn-fl-secondary">
+            Voir toutes les sneakers
+        </a>
+    </div>
+</section>
+
+{# Featured Products #}
+<section id="featured" class="section-fl">
+    <div class="container">
+        <div class="section-header center">
+            <div class="section-label">Best Sellers</div>
+            <h2 class="section-title">Les Plus Populaires</h2>
+        </div>
+
+        <div class="product-grid-fl">
+            {% for product in featuredProducts %}
+                <a href="{{ path('app_product_detail', {slug: product.slug}) }}" class="product-card-fl">
+                    <div class="product-image-container">
+                        {% if product.isNewArrival %}
+                        <div class="product-badge new">New</div>
+                        {% elseif product.discountPrice %}
+                        <div class="product-badge">-{{ (((product.price - product.discountPrice) / product.price) * 100)|round }}%</div>
+                        {% endif %}
+                        <img src="{{ product.images[0] }}" alt="{{ product.name }}" class="product-image-fl">
+                    </div>
+
+                    <div class="product-info-fl">
+                        <div class="product-brand">{{ product.brand.name }}</div>
+                        <h3 class="product-name-fl">{{ product.name }}</h3>
+                        <div>
+                            <span class="product-price-fl">{{ product.finalPrice }} €</span>
+                            {% if product.discountPrice %}
+                            <span class="product-price-old">{{ product.price }} €</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+
+        <div style="text-align: center; margin-top: 3rem;">
+            <a href="{{ path('app_products') }}" class="btn-fl btn-fl-primary">
+                Voir toutes les sneakers
+            </a>
+        </div>
+    </div>
+</section>
+
+{# Features Section #}
+<section class="section-fl gray" style="margin-bottom: 0; padding-bottom: 4rem;">
+    <div class="container">
+        <div class="features-fl">
+            <div class="feature-item-fl">
+                <div class="feature-icon-fl">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <h3 class="feature-title-fl">Livraison Gratuite</h3>
+                <p class="feature-desc-fl">Pour toute commande supérieure à 50€</p>
+            </div>
+            <div class="feature-item-fl">
+                <div class="feature-icon-fl">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h3 class="feature-title-fl">100% Authentique</h3>
+                <p class="feature-desc-fl">Toutes nos sneakers sont garanties authentiques</p>
+            </div>
+            <div class="feature-item-fl">
+                <div class="feature-icon-fl">
+                    <i class="bi bi-arrow-repeat"></i>
+                </div>
+                <h3 class="feature-title-fl">Retours 30 Jours</h3>
+                <p class="feature-desc-fl">Changez d'avis en toute simplicité</p>
+            </div>
+            <div class="feature-item-fl">
+                <div class="feature-icon-fl">
+                    <i class="bi bi-lightning-charge"></i>
+                </div>
+                <h3 class="feature-title-fl">Expédition Rapide</h3>
+                <p class="feature-desc-fl">Livraison en 24-48h partout en France</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

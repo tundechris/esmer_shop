@@ -1,0 +1,47 @@
+{% use "form_div_layout.html.twig" %}
+
+{# Form Row #}
+{% block form_row -%}
+    <div style="margin-bottom: var(--spacing-md);">
+        {{- form_label(form) -}}
+        {{- form_widget(form) -}}
+        {{- form_errors(form) -}}
+    </div>
+{%- endblock form_row %}
+
+{# Form Widget #}
+{% block form_widget_simple -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control-apple')|trim}) %}
+    {{- parent() -}}
+{%- endblock form_widget_simple %}
+
+{# Textarea Widget #}
+{% block textarea_widget -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control-apple')|trim}) %}
+    {{- parent() -}}
+{%- endblock textarea_widget %}
+
+{# Checkbox Widget #}
+{% block checkbox_widget -%}
+    {% set attr = attr|merge({style: (attr.style|default('') ~ ' width: 18px; height: 18px; cursor: pointer;')|trim}) %}
+    {{- parent() -}}
+{%- endblock checkbox_widget %}
+
+{# Form Label #}
+{% block form_label -%}
+    {% if label is not same as(false) -%}
+        {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' form-label-apple')|trim}) %}
+    {%- endif %}
+    {{- parent() -}}
+{%- endblock form_label %}
+
+{# Form Errors #}
+{% block form_errors -%}
+    {% if errors|length > 0 -%}
+        <div class="alert-apple alert-apple-error" style="margin-top: 8px; font-size: 13px;">
+            {%- for error in errors -%}
+                <div><i class="bi bi-exclamation-circle"></i> {{ error.message }}</div>
+            {%- endfor -%}
+        </div>
+    {%- endif %}
+{%- endblock form_errors %}
